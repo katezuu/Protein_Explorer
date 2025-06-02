@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Results for {{ pdb1 }}{% if pdb2 %} &amp; {{ pdb2 }}{% endif %}</title>
+
+  <!-- Bootstrap 5 CSS (CDN) -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoDy+MJ1NQvHhZ+0v5niC5oYxhb2Ox77mjaMQuI5GqXn/tm"
+    crossorigin="anonymous"
+  />
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">
+      Analysis Results: {{ pdb1 }}{% if pdb2 %}<span class="text-secondary"> &amp; {{ pdb2 }}</span>{% endif %}
+    </h1>
+
+    <!-- First structure block -->
+    <div class="row mb-5">
+      <div class="col-lg-6">
+        <!-- Statistics card -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Structure {{ pdb1 }}</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Total Residues:</strong> {{ total1 }}</p>
+            <p><strong>Residues per Chain:</strong></p>
+            <ul>
+              {% for chain_id, count in chains1.items() %}
+                <li>Chain {{ chain_id }}: {{ count }} residues</li>
+              {% endfor %}
+            </ul>
+            <p><strong>Sequences:</strong></p>
+            {% for chain_id, seq in seqs1.items() %}
+              <h6>Chain {{ chain_id }} ({{ seq|length }} aa):</h6>
+              <pre class="small">{{ seq }}</pre>
+            {% endfor %}
+            <p><strong>Center of Mass (Cα):</strong> {{ center1 }}</p>
+          </div>
+        </div>
+
+        <!-- Static plots -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-body text-center">
+            <h6>Cα 3D Scatter Plot</h6>
+            <img
+              src="{{ ca1_url }}"
+              class="img-fluid mb-3 border"
+              alt="C-alpha Scatter {{ pdb1 }}"
+            />
+            <h6>Ramachandran Plot</h6>
+            <img
+              src="{{ rama1_url }}"
+              class="img-fluid border"
+              alt="Ramachandran {{ pdb1 }}"
+            />
+          </div>
+        </div>
+
+        <!-- Download link for PDB file -->
+        <div class="text-center mt-3">
+          <a href="{{ pdb1_file_url }}" class="btn btn-outline-secondary btn-sm" download>Download PDB {{ pdb1 }}</a>
+        </div>
+      </div>
+
+      {% if pdb2 %}
+      <!-- Second structure block -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Structure {{ pdb2 }}</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Total Residues:</strong> {{ total2 }}</p>
+            <p><strong>Residues per Chain:</strong></p>
+            <ul>
+              {% for chain_id, count in chains2.items() %}
+                <li>Chain {{ chain_id }}: {{ count }} residues</li>
+              {% endfor %}
+            </ul>
+            <p><strong>Sequences:</strong></p>
+            {% for chain_id, seq in seqs2.items() %}
+              <h6>Chain {{ chain_id }} ({{ seq|length }} aa):</h6>
+              <pre class="small">{{ seq }}</pre>
+            {% endfor %}
+            <p><strong>Center of Mass (Cα):</strong> {{ center2 }}</p>
+          </div>
+        </div>
+        <div class="card shadow-sm mb-3">
+          <div class="card-body text-center">
+            <h6>Cα 3D Scatter Plot</h6>
+            <img
+              src="{{ ca2_url }}"
+              class="img-fluid mb-3 border"
+              alt="C-alpha Scatter {{ pdb2 }}"
+            />
+            <h6>Ramachandran Plot</h6>
+            <img
+              src="{{ rama2_url }}"
+              class="img-fluid border"
+              alt="Ramachandran {{ pdb2 }}"
+            />
+          </div>
+        </div>
+
+        <!-- Download link for second PDB file -->
+        <div class="text-center mt-3">
+          <a href="{{ pdb2_file_url }}" class="btn btn-outline-secondary btn-sm" download>Download PDB {{ pdb2 }}</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if rmsd %}
+    <!-- RMSD result block -->
+    <div class="row mb-5">
+      <div class="col-12">
+        <div class="alert alert-info text-center shadow-sm">
+          <h5 class="mb-0">
+            RMSD between <strong>{{ pdb1 }}</strong> and <strong>{{ pdb2 }}</strong>:
+            <span class="fw-bold">{{ "%.3f"|format(rmsd) }} Å</span>
+          </h5>
+          <p class="mb-0">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm mt-2">Analyze Another PDB</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Back to form link if no RMSD (single PDB case) -->
+    <div class="text-center mb-5">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Analyze Another PDB</a>
+    </div>
+    {% endif %}
+
+    <footer class="text-center text-muted mt-4">
+      &copy; 2025 Protein Structure Explorer
+    </footer>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle (CDN) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+AMvyTG5TFtvHOV1RT+AmV5Qy4HV+"
+    crossorigin="anonymous"
+  ></script>
+</body>
+</html>
