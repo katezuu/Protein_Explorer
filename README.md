@@ -17,24 +17,6 @@
 
 ## Repository Structure
 
-Protein_Explorer/
-├── Dockerfile
-├── Procfile
-├── LICENSE
-├── README.md
-├── explorer.py
-├── app.py
-├── requirements.txt
-├── pytest.ini
-├── .github/
-│ └── workflows/
-│ └── ci.yml
-├── templates/
-│ ├── index.html
-│ └── result.html
-└── tests/
-├── test_explorer.py
-└── test_app.py
 
 - `explorer.py` — Core functions for parsing PDB, computing metrics, plotting, and RMSD.
 - `app.py` — Flask application: routes, form validation, result rendering.
