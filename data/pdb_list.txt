@@ -1,7 +1,28 @@
-1AKE
-1PKE
-2PTC
-2PTK
-5XNL
-6LU7
-7AHD
+1AKE   # adenylate kinase
+2PTC   # trypsin–inhibitor complex
+1LYZ   # hen-egg-white lysozyme
+1D66   # dihydrofolate reductase
+1H2W   # HIV-1 protease
+1H4L   # cytochrome P450-cam
+4WNC   # human acetylcholinesterase
+2C7E   # alanine racemase
+5E8A   # catalytic antibody 48G7
+3G5U   # T7 RNA polymerase
+1CRN   # crambin (plant protein)
+1BRS   # barnase
+1PPT   # pancreatic trypsin inhibitor (BPTI)
+1TIT   # titin I27 domain
+2WXC   # WW domain of Pin1
+1A0S   # bacteriorhodopsin
+1A0I   # KcsA potassium channel
+2POR   # OmpF porin
+2RH1   # β2-adrenergic GPCR
+3SN6   # μ-opioid GPCR
+3MKT   # leucine transporter (LeuT)
+6CP6   # mitochondrial ATP-synthase F1 domain
+5I6X   # human GLUT1 glucose transporter
+4V4Q   # E. coli 70S ribosome (small subunit)
+3J3Q   # yeast mitochondrial ribosome
+7KOO   # human 80S ribosome (snapshot)
+6VXX   # SARS-CoV-2 spike trimer
+5L93   # human clathrin coat

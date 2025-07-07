@@ -66,3 +66,8 @@ This project loads the following libraries from CDNs:
 - **Plotly.js** for interactive charts
 - **Bootstrap 5** for UI styling
 
+## Notebooks & Reports
+- 📓 `notebooks/dataset_analysis.ipynb`
+- 📄 `reports/dataset_analysis.pdf`
+- 💾 `results/dataset_metrics.csv`
+
