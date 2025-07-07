@@ -2,7 +2,7 @@ name: Build & Deploy Sphinx docs
 
 on:
   push:
-    branches: [main]          # генерировать сайт при каждом пуше в main
+    branches: [master]          # генерировать сайт при каждом пуше в main
     paths:
       - "docs/**"             # или добавь *.py, README.md и т.д.
 
