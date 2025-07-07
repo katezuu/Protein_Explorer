@@ -4,7 +4,9 @@ on:
   push:
     branches: [master]          # генерировать сайт при каждом пуше в main
     paths:
-      - "docs/**"             # или добавь *.py, README.md и т.д.
+      - "docs/**"
+      - "README.md"
+      - ".github/workflows/**"           # или добавь *.py, README.md и т.д.
 
 permissions:
   contents: write             # нужно для публикации Pages
