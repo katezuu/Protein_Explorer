@@ -3,6 +3,7 @@
 [![CI Status](https://github.com/katezuu/Protein_Explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/your_username/Protein_Explorer/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/katezu/protein-explorer.svg)](https://hub.docker.com/r/katezu/protein-explorer)
+[![Docs](https://img.shields.io/website?url=https%3A%2F%2Fkatezuu.github.io%2FProtein_Explorer%2F)](https://katezuu.github.io/Protein_Explorer/)
 
 
 ## Overview

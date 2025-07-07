@@ -6,7 +6,8 @@ on:
     paths:
       - "docs/**"
       - "README.md"
-      - ".github/workflows/**"           # или добавь *.py, README.md и т.д.
+      - ".github/workflows/**"
+      - "*.py"
 
 permissions:
   contents: write             # нужно для публикации Pages
