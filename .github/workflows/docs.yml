@@ -30,9 +30,7 @@ jobs:
           pip install -r requirements.txt sphinx sphinx-rtd-theme
 
       - name: Build HTML
-        run: |
-          cd docs
-          make html
+      - run: sphinx-build -b html docs docs/_build/html
 
       # загружаем артефакт Pages
       - name: Upload Pages artifact
