@@ -139,6 +139,15 @@ def compute_center_of_mass(structure) -> np.ndarray:
     return np.mean(coords, axis=0)
 
 
+def get_ca_coordinates(structure) -> list:
+    """Return a list of [x, y, z] for all C-alpha atoms."""
+    coords = []
+    for atom in structure.get_atoms():
+        if atom.get_id() == "CA":
+            coords.append(atom.get_coord().tolist())
+    return coords
+
+
 def get_phi_psi(structure) -> list:
     """
     Calculate φ (phi) and ψ (psi) dihedral angles (in degrees) for each residue.
@@ -165,10 +174,10 @@ def plot_ca_scatter(structure, output_path: str):
     """
     Plot a 3D scatter of all Cα atoms and save as PNG.
 
-    Args:
-        structure: a Bio.PDB.Structure.Structure object.
-        output_path: Path (including filename) to save the PNG.
-    """
+Args:
+    structure: a Bio.PDB.Structure.Structure object.
+    output_path: Path (including filename) to save the PNG.
+"""
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
     xs, ys, zs = [], [], []
@@ -239,7 +248,6 @@ def compare_structures(path1: str, path2: str, out_dir: str) -> float:
     model2 = next(struct2.get_models())
     chain1_id = next(model1.get_chains()).id
     chain2_id = next(model2.get_chains()).id
-
     ca1 = [res["CA"] for res in model1[chain1_id] if is_aa(res) and "CA" in res]
     ca2 = [res["CA"] for res in model2[chain2_id] if is_aa(res) and "CA" in res]
 
@@ -266,3 +274,105 @@ def compare_structures(path1: str, path2: str, out_dir: str) -> float:
         f.write(f"RMSD between {id1} and {id2}: {rmsd_value:.3f} Å\n")
 
     return rmsd_value
+
+
+# --- Mutation Analysis Functions ---
+import requests
+from Bio.PDB.Polypeptide import three_to_index, index_to_three
+
+
+def fetch_uniprot_variants(accession: str) -> list:
+    """Fetch variant data from UniProt REST API for a given accession."""
+    url = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+    except Exception as exc:
+        raise RuntimeError(f"Failed to fetch UniProt data: {exc}") from exc
+
+    data = resp.json()
+    variants = []
+    for feature in data.get("features", []):
+        if feature.get("type") == "VARIANT":
+            loc = feature.get("location", {})
+            pos = loc.get("start")
+            desc = feature.get("description", "")
+            variant_type = feature.get("ftType", "variant")
+            variants.append({
+                "position": pos,
+                "type": variant_type,
+                "description": desc,
+                "source": "UniProt",
+            })
+    return variants
+
+
+def fetch_clinvar_variants(gene: str) -> list:
+    """Fetch variant data from ClinVar for a given gene symbol."""
+    url = (
+        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+        f"?db=clinvar&retmode=json&term={gene}[gene]"
+    )
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+    except Exception as exc:
+        raise RuntimeError(f"Failed to fetch ClinVar data: {exc}") from exc
+
+    ids = resp.json().get("esearchresult", {}).get("idlist", [])
+    variants = []
+    for cid in ids[:5]:  # limit to first few ids for brevity
+        summary_url = (
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
+            f"?db=clinvar&id={cid}&retmode=json"
+        )
+        try:
+            sresp = requests.get(summary_url, timeout=10)
+            sresp.raise_for_status()
+            info = sresp.json()["result"][cid]
+            hgvs = info.get("title", "")
+            clinsig = info.get("clinical_significance", {}).get("description", "")
+            variants.append({
+                "hgvs": hgvs,
+                "clinical_significance": clinsig,
+                "source": "ClinVar",
+            })
+        except Exception:
+            continue
+    return variants
+
+
+def model_mutation(pdb_path: str, mutation: str):
+    """Introduce a simple single point mutation and return the mutated structure."""
+    struct = parse_structure(pdb_path)
+    old = mutation[0]
+    new = mutation[-1]
+    pos = int(mutation[1:-1])
+    for residue in struct.get_residues():
+        if residue.id[1] == pos:
+            residue.resname = index_to_three(new.upper())
+    return struct
+
+
+def compute_mutation_rmsd(wt_struct, mut_struct) -> float:
+    """Compute CA RMSD between wild type and mutant structures."""
+    model1 = next(wt_struct.get_models())
+    model2 = next(mut_struct.get_models())
+    chain1_id = next(model1.get_chains()).id
+    chain2_id = next(model2.get_chains()).id
+    ca1 = [res["CA"] for res in model1[chain1_id] if is_aa(res) and "CA" in res]
+    ca2 = [res["CA"] for res in model2[chain2_id] if is_aa(res) and "CA" in res]
+    n = min(len(ca1), len(ca2))
+    ca1 = ca1[:n]
+    ca2 = ca2[:n]
+    sup = Superimposer()
+    sup.set_atoms(ca1, ca2)
+    sup.apply(model2.get_atoms())
+    return sup.rms
+
+
+def compute_center_of_mass_difference(wt_struct, mut_struct) -> float:
+    """Return Euclidean distance between centers of mass of two structures."""
+    com1 = compute_center_of_mass(wt_struct)
+    com2 = compute_center_of_mass(mut_struct)
+    return float(np.linalg.norm(com1 - com2))

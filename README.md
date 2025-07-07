@@ -1,6 +1,9 @@
 # Protein Structure Explorer
 
+[![CI Status](https://github.com/katezuu/Protein_Explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/your_username/Protein_Explorer/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Docker Pulls](https://img.shields.io/docker/pulls/katezu/protein-explorer.svg)](https://hub.docker.com/r/katezu/protein-explorer)
+
 
 ## Overview
 
@@ -17,24 +20,6 @@
 
 ## Repository Structure
 
-Protein_Explorer/
-├── Dockerfile
-├── Procfile
-├── LICENSE
-├── README.md
-├── explorer.py
-├── app.py
-├── requirements.txt
-├── pytest.ini
-├── .github/
-│ └── workflows/
-│ └── ci.yml
-├── templates/
-│ ├── index.html
-│ └── result.html
-└── tests/
-├── test_explorer.py
-└── test_app.py
 
 - `explorer.py` — Core functions for parsing PDB, computing metrics, plotting, and RMSD.
 - `app.py` — Flask application: routes, form validation, result rendering.
@@ -55,4 +40,29 @@ Protein_Explorer/
 2. **Navigate** to the project directory:
    ```bash
    cd Protein_Explorer
+
+3. Install dependencies and run:
+   ```bash
+   pip install -r requirements.txt
+   flask run
+   ```
+
+## Mutation Analysis Features
+
+- `/mutations` form to submit a PDB ID and mutation code.
+- `/analyze_mutation` performs simple in-memory modeling of the mutation and displays RMSD and center-of-mass shift.
+- REST endpoints `/api/metrics/<pdb_id>` and `/api/mutation_metrics/<pdb_id>/<mutation>` return JSON metrics.
+
+## Interactive Visualization
+
+- Results pages embed the NGL viewer to explore structures in 3D.
+- Plotly charts show interactive Cα scatter and Ramachandran plots with zoom and hover capabilities.
+
+## Frontend Dependencies
+
+This project loads the following libraries from CDNs:
+
+- **NGL Viewer** for 3D visualization
+- **Plotly.js** for interactive charts
+- **Bootstrap 5** for UI styling
 

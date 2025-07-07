@@ -25,6 +25,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install JS deps
+        run: npm install --global playwright
+
       - name: Run tests
         run: |
           pytest --maxfail=1 --disable-warnings -q
+
+      - name: Build Docker image
+        run: docker build -t protein-explorer .

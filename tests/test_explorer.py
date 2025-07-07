@@ -12,6 +12,9 @@ from explorer import (
     plot_ca_scatter,
     get_phi_psi,
     parse_structure,
+    fetch_uniprot_variants,
+    model_mutation,
+    compute_mutation_rmsd,
 )
 
 # Two minimal PDB contents with two Cα atoms each:
@@ -71,26 +74,50 @@ def test_compare_structures_rmsd(tmp_path):
     # After superimposition, RMSD ought to be exactly 0.0
     assert pytest.approx(rmsd, abs=1e-6) == 0.0
 
+    def test_plot_functions(tmp_path):
+        """
+        Verify that plot_ca_scatter and plot_ramachandran create non-empty PNG files,
+        and that get_phi_psi returns a list of (phi, psi) tuples.
+        """
+        # Create a temporary directory and PDB file
+        dirp = tmp_path / "pdb"
+        dirp.mkdir()
+        path = write_temp_pdb(PDB_CONTENT1, str(dirp), "P1.pdb")
 
-def test_plot_functions(tmp_path):
-    """
-    Verify that plot_ca_scatter and plot_ramachandran create non-empty PNG files,
-    and that get_phi_psi returns a list of (phi, psi) tuples.
-    """
-    # Create a temporary directory and PDB file
-    dirp = tmp_path / "pdb"
-    dirp.mkdir()
-    path = write_temp_pdb(PDB_CONTENT1, str(dirp), "P1.pdb")
+        struct = parse_structure(path)
+        angles = get_phi_psi(struct)
+        assert isinstance(angles, list)
 
-    struct = parse_structure(path)
-    angles = get_phi_psi(struct)
-    assert isinstance(angles, list)
+        scatter_png = tmp_path / "scatter.png"
+        rama_png = tmp_path / "rama.png"
 
-    scatter_png = tmp_path / "scatter.png"
-    rama_png = tmp_path / "rama.png"
+        plot_ca_scatter(struct, str(scatter_png))
+        plot_ramachandran(angles, str(rama_png))
 
-    plot_ca_scatter(struct, str(scatter_png))
-    plot_ramachandran(angles, str(rama_png))
+        assert scatter_png.exists() and scatter_png.stat().st_size > 0
+        assert rama_png.exists() and rama_png.stat().st_size > 0
 
-    assert scatter_png.exists() and scatter_png.stat().st_size > 0
-    assert rama_png.exists() and rama_png.stat().st_size > 0
+    def test_model_mutation_and_rmsd(tmp_path):
+        path = write_temp_pdb(PDB_CONTENT1, str(tmp_path), "WT.pdb")
+        wt_struct = parse_structure(path)
+        mut_struct = model_mutation(path, "A1C")
+        rmsd = compute_mutation_rmsd(wt_struct, mut_struct)
+        assert isinstance(rmsd, float)
+
+    def test_fetch_uniprot_variants(monkeypatch):
+        class FakeResp:
+            def __init__(self, data):
+                self._data = data
+
+            def json(self):
+                return self._data
+
+            def raise_for_status(self):
+                pass
+
+        def fake_get(url, timeout=10):
+            return FakeResp({"features": [{"type": "VARIANT", "location": {"start": 1}, "description": "mut"}]})
+
+        monkeypatch.setattr("requests.get", fake_get)
+        variants = fetch_uniprot_variants("P01234")
+        assert variants and variants[0]["position"] == 1
