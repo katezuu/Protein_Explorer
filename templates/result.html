@@ -7,6 +7,15 @@
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoDy+MJ1NQvHhZ+0v5niC5oYxhb2Ox77mjaMQuI5GqXn/tm" crossorigin="anonymous">
+  <style>
+    html { scroll-behavior: smooth; }
+    #backToTop {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      display: none;
+    }
+  </style>
 </head>
 <body class="bg-light">
   <div class="container py-5">
@@ -100,6 +109,7 @@
     <footer class="text-center text-muted mt-4">
       &copy; 2025 Protein Structure Explorer
     </footer>
+    <button id="backToTop" class="btn btn-secondary" aria-label="Back to top">&uarr;</button>
   </div>
 
   <!-- Scripts -->
@@ -126,6 +136,15 @@
     Plotly.newPlot('ca_plot2', [{ x: ca2.map(c => c[0]), y: ca2.map(c => c[1]), z: ca2.map(c => c[2]), mode: 'markers', type: 'scatter3d', marker: { color: 'green' } }]);
     Plotly.newPlot('rama_plot2', [{ x: angles2.map(a => a[0]), y: angles2.map(a => a[1]), mode: 'markers', type: 'scatter', marker: { color: 'green' } }], { xaxis: { title: 'Phi' }, yaxis: { title: 'Psi' } });
     {% endif %}
+  </script>
+  <script>
+    const backBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      backBtn.style.display = window.scrollY > 200 ? 'block' : 'none';
+    });
+    backBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   </script>
 </body>
 </html>

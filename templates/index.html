@@ -19,6 +19,15 @@
       align-items: center;     /* Center vertically */
       height: 200px;           /* Adjust height as needed */
     }
+    html {
+      scroll-behavior: smooth;
+    }
+    #backToTop {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      display: none;
+    }
   </style>
 </head>
 <body class="bg-light">
@@ -91,6 +100,7 @@
     <footer class="mt-5 text-center text-muted">
       &copy; 2025 Protein Structure Explorer
     </footer>
+    <button id="backToTop" class="btn btn-secondary" aria-label="Back to top">&uarr;</button>
   </div>
 
   <!-- Bootstrap 5 JS Bundle (CDN) -->
@@ -106,6 +116,14 @@
       const form = document.getElementById("pdb-form");
       const formContainer = document.getElementById("form-container");
       const spinnerContainer = document.getElementById("spinner-container");
+      const backBtn = document.getElementById("backToTop");
+
+      window.addEventListener("scroll", () => {
+        backBtn.style.display = window.scrollY > 200 ? "block" : "none";
+      });
+      backBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
 
       form.addEventListener("submit", () => {
         // Hide the form container

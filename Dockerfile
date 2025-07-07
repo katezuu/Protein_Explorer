@@ -1,26 +1,26 @@
 # Dockerfile
-# Базовый образ с Python 3.10
+# Base image with Python 3.10
 FROM python:3.10-slim
 
-# Настраиваем рабочую директорию
+# Set working directory
 WORKDIR /app
 
-# Копируем файлы с зависимостями
+# Copy dependency file
 COPY requirements.txt requirements.txt
 
-# Устанавливаем зависимости
+# Install dependencies
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Копируем весь проект в контейнер
+# Copy the entire project into the container
 COPY . .
 
-# Указываем переменные окружения
+# Set environment variables
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 
-# Открываем порт
+# Expose port
 EXPOSE 5000
 
-# По умолчанию запускаем gunicorn
+# Default command launches Gunicorn
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
