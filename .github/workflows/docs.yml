@@ -19,19 +19,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
-      - name: Install dependencies
-        run: pip install sphinx myst-parser furo
-      - name: Build Sphinx docs
-        run: |
-          cd docs
-          make html
+          python-version: '3.x'
 
-      # Загружаем артефакт для деплоя
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install sphinx myst-parser furo
+
+      - name: Build Sphinx documentation
+        working-directory: docs
+        run: make html
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
@@ -44,4 +48,5 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
         with:
+          # GitHub автоматически подставит GITHUB_TOKEN
           token: ${{ secrets.GITHUB_TOKEN }}
