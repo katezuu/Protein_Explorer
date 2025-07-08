@@ -3,9 +3,17 @@ name: Build and Deploy Docs
 # Триггеры — при пуше в main и по ручному запуску
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [master]
+    paths:
+        - "docs/**"
+        - "README.md"
+        - ".github/workflows/**"
+
+
+permissions:
+  contents: write             # нужно для публикации Pages
+  pages: write
+  id-token: write
 
 jobs:
   build:
