@@ -17,11 +17,9 @@ Times measured on Chrome v124 + GTX 1660Ti.
 |--------|------------|--------------|----------|
 | A | Structural bioinformatician | ✔ | “Cleaner than Mol* for quick RMSD checks” |
 | B | PhD student, GPCR field | ✔ | “Love the live Ramachandran plot; would like CSV export per‑chain” |
-| C | Undergraduate | ✖ (missed dual‑mode toggle) | “Add tooltip for second PDB input” |
+| C | Undergraduate | ✖ | “Add tooltip for second PDB input” |
 
 ## Improvement Road‑Map
-1. Tooltip explaining dual‑ID analysis.  
-2. Per‑chain CSV export of φ/ψ angles.  
-3. Lazy‑load large structures to reduce first render time.
-
----
+1. Tooltip explaining dual‑ID analysis  
+2. Per‑chain CSV export of φ/ψ angles  
+3. Lazy‑load large structures to reduce first render time

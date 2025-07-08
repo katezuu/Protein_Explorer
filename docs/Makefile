@@ -1,18 +1,11 @@
-# Makefile for Sphinx documentation
+.PHONY: html clean
 
 SPHINXBUILD   = sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = _build
 
-.PHONY: help clean html
-
-help:
-	@echo "Usage:"
-	@echo "  make html   Build HTML documentation"
-	@echo "  make clean  Remove build files"
-
 html:
-	$(SPHINXBUILD) -b html $(SOURCEDIR) $(BUILDDIR)/html
+	$(SPHINXBUILD) -M html $(SOURCEDIR) $(BUILDDIR)
 
 clean:
-	@rm -rf $(BUILDDIR)/*
+	rm -rf $(BUILDDIR)

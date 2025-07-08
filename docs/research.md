@@ -12,10 +12,11 @@ viewer, allowing users to click a Ramachandran region and immediately
 highlight residues in 3‑D.
 
 ## Literature Review
+
 | Tool | Strengths | Limitations |
 |------|-----------|-------------|
 | **PyMOL Web** | Mature viewer, scripting | Lacks interactive charts |
-| **Mol** | Modern WebGL, large structures | No built‑in φ/ψ statistics |
+| **Mol\*** | Modern WebGL, large structures | No built‑in φ/ψ statistics |
 | **UCSF ChimeraX** | Advanced analysis | Desktop‑only |
 | **Protein Explorer** | Combines viewer **+** live analytics in browser | Prototype stage |
 
@@ -52,4 +53,4 @@ bioinformatics is feasible. Future steps include MD‑trajectory support and
 ML‑driven binding‑pocket prediction.
 
 ---
-_Full PDF available at [`reports/dataset_analysis.pdf`](../reports/dataset_analysis.pdf)_
+Full PDF available in the `reports/` folder.
