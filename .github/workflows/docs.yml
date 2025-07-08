@@ -1,40 +1,33 @@
-name: Build & Deploy Sphinx docs
-
-on:
-  push:
-    branches: [master]          # генерировать сайт при каждом пуше в main
-    paths:
-      - "docs/**"
-      - "README.md"
-      - ".github/workflows/**"
-      - "*.py"
-
-permissions:
-  contents: write             # нужно для публикации Pages
-  pages: write
-  id-token: write
-
 jobs:
-  build-docs:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.x'
 
       - name: Install dependencies
+        run: pip install sphinx myst-parser furo
+
+      - name: Build Sphinx docs
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt                # установит Sphinx + furo
-          # (если requirements.txt разделён, можно отдельно)
-          # pip install sphinx furo
+          cd docs
+          make html
 
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs/_build/html
 
-
-      # деплой на GitHub Pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4   # официальный экшен
+        uses: actions/deploy-pages@v1
+        with:
+          # автоматически берёт ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
