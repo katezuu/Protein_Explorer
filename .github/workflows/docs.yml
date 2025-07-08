@@ -29,6 +29,7 @@ jobs:
           make html
 
       - name: Upload Pages artifact
+        # Здесь используется именно upload-pages-artifact, а не upload-artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build/html
@@ -40,5 +41,4 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
         with:
-          # GitHub сам подставит GITHUB_TOKEN
           token: ${{ secrets.GITHUB_TOKEN }}
