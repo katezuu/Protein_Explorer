@@ -59,7 +59,7 @@ docker run -p 5000:5000 protein-explorer
   [`reports/dataset_analysis.pdf`](../reports/dataset_analysis.pdf)
 
 * 💾 **Exported metrics CSV**  
-  [`results/dataset_metrics.csv`](../results/dataset_metrics.csv)
+  [`results/dataset_metrics.csv`](../notebooks/results/dataset_metrics.csv)
 
 ## Documentation Sections
 - [Research article summary](research.md)
