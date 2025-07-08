@@ -1,40 +1,69 @@
-# Protein Explorer <!-- omit in toc -->
-
-Interactive web platform for **analysis and 3-D visualisation of PDB structures**  
-_(Flask • Biopython • NGL • Plotly)_  
-
-[Live demo ↗](../) • [Research article ↗](research.md)
-
-## Table of contents
-1. [Overview](#overview)  
-2. [Quick start](#quick-start)  
-3. [Installation](#installation)  
-4. [Project layout](#project-layout)  
-5. [Notebooks & Reports](#notebooks--reports)  
-6. [Contributing](#contributing)  
-
+---
+title: Protein Explorer Documentation
 ---
 
+# Protein Explorer
+
+**Interactive web platform for protein structure analysis and visualisation**
+
 ## Overview
-Protein Explorer lets you **upload or fetch PDB entries**, calculate key
-metrics (RMSD, φ/ψ angles, centre of mass), and inspect structures
-directly in the browser via NGL and Plotly widgets.
+Protein Explorer lets you upload one or two PDB IDs, computes key structural
+metrics (RMSD, φ/ψ angles, centre of mass) and shows the results in the browser
+with an interactive 3‑D **NGL viewer** and interactive **Plotly** charts.
 
-Main features  
-- One-click download of PDB IDs (single or pair)  
-- Real-time φ/ψ and C-α scatter plots (Plotly)  
-- RMSD alignment and heat-map export  
-- Containerised deployment (Docker)  
-- Jupyter notebook for large-scale dataset analysis  
-- Unit-tested core (`pytest`, CI workflow)
+## Key Features
+- Single‑ and dual‑structure analysis with automatic RMSD alignment
+- Real‑time φ/ψ Ramachandran plots, Cα scatter and centre‑of‑mass
+  visualisation
+- Batch analysis notebook for 30 + proteins with PCA and clustering
+- Docker container, CI tests and GitHub Pages documentation
 
-## Quick start
+## Quick Start
 
 ```bash
-# clone & install
+# Clone & install
 git clone https://github.com/katezuu/Protein_Explorer.git
 cd Protein_Explorer
 pip install -r requirements.txt
 
-# run locally
-flask run  # open http://localhost:5000
+# Run the web app
+flask run  # opens http://localhost:5000
+```
+
+Or use Docker:
+
+```bash
+docker build -t protein-explorer .
+docker run -p 5000:5000 protein-explorer
+```
+
+## Repository Layout
+
+| Folder/File | Purpose |
+|-------------|---------|
+| `src/` or root `*.py` | Application logic (`app.py`, `explorer.py`) |
+| `templates/` | Jinja2 HTML templates |
+| `notebooks/` | Jupyter notebooks for dataset analysis |
+| `reports/`   | PDF reports (exported notebooks & article) |
+| `results/`   | Example CSV/PNG output files |
+| `docs/`      | This documentation (published via GitHub Pages) |
+| `tests/`     | Pytest unit‑tests & CI workflow |
+| `Dockerfile` | Container build definition |
+
+## Notebooks & Reports
+
+* 📓 **Dataset analysis notebook**  
+  [`notebooks/dataset_analysis.ipynb`](../notebooks/dataset_analysis.ipynb)
+
+* 📄 **PDF research report**  
+  [`reports/dataset_analysis.pdf`](../reports/dataset_analysis.pdf)
+
+* 💾 **Exported metrics CSV**  
+  [`results/dataset_metrics.csv`](../results/dataset_metrics.csv)
+
+## Documentation Sections
+- [Research article summary](research.md)
+- [Usability & performance](usability.md)
+
+---
+_Last updated: 2025-07-08_
