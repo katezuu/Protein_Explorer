@@ -1,25 +1,16 @@
-name: Build and Deploy Docs
+name: Build & Deploy Docs
 
-# Триггеры — при пуше в main и по ручному запуску
 on:
   push:
-    branches: [master]
-    paths:
-        - "docs/**"
-        - "README.md"
-        - ".github/workflows/**"
-
-
-permissions:
-  contents: write             # нужно для публикации Pages
-  pages: write
-  id-token: write
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -29,12 +20,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install sphinx myst-parser furo
 
-      - name: Build Sphinx documentation
+      - name: Build Sphinx docs
         working-directory: docs
-        run: make html
+        run: |
+          make clean
+          make html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
@@ -48,5 +40,5 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
         with:
-          # GitHub автоматически подставит GITHUB_TOKEN
+          # GitHub сам подставит GITHUB_TOKEN
           token: ${{ secrets.GITHUB_TOKEN }}
