@@ -3,10 +3,6 @@ name: Build & Deploy Docs
 on:
   push:
     branches: [master]
-    paths:
-      - "docs/**"
-      - "README.md"
-      - "docs.yml"
 
 permissions:
   contents: read
