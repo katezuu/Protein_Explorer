@@ -6,6 +6,7 @@ on:
     paths:
       - "docs/**"
       - "README.md"
+      - "docs.yml"
 
 permissions:
   contents: read
