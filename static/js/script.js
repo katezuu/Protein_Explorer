@@ -85,14 +85,14 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         // Подсветим в NGL
-        if (window.stage1) {
-          window.stage1.addRepresentation("ball+stick", {
-            sele: `${chain} and ${resNum}`,
-            colorValue: 0xFF0000,
-            scale: 2.5
-          });
-          window.stage1.autoView();
-        }
+        if (window.comp1) {
+            window.comp1.addRepresentation("ball+stick", {
+                sele: `${chain} and ${resNum}`,
+                colorValue: 0xFF0000,
+                scale: 2.5
+            });
+  window.stage1.autoView();
+}
       } catch (err) {
         resultDiv.textContent = "Error: " + err.message;
         console.error(err);

@@ -154,7 +154,12 @@
     // NGL Viewer 1
     window.PDB_ID = "{{ pdb1 }}";
     window.stage1 = new NGL.Stage('viewer1');
-    stage1.loadFile('{{ pdb1_file_url }}').then(o => { o.addRepresentation('cartoon'); stage1.autoView(); });
+    window.comp1   = null;  // глобально сохраняем компонент
+    window.stage1.loadFile('{{ pdb1_file_url }}').then(o => {
+      window.comp1 = o;
+      o.addRepresentation('cartoon');
+    window.stage1.autoView();
+  });
     // Plotly charts for structure 1
     const ca1 = {{ ca_coords1|tojson }};
     const angles1 = {{ angles1|tojson }};
