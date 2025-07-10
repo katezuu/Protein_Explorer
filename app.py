@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+app.py
+
+Flask web application for Protein Structure Explorer:
+- Downloads PDB or mmCIF (with gzip) with automatic fallback.
+- Parses structures using correct format (.pdb or .cif).
+- Analyzes single structures or pairs (residue counts, center-of-mass, RMSD).
+- Serves files and mutation API.
+"""
+
 import os
 import re
 import gzip
@@ -48,7 +59,6 @@ def download_structure(pdb_id: str, out_dir: str):
         cif_name = os.path.basename(cif_path)
         gz_path  = cif_path + ".gz"
         gz_name  = cif_name + ".gz"
-        # ensure gzip exists
         if not os.path.exists(gz_path):
             with open(cif_path, "rb") as f_in, gzip.open(gz_path, "wb") as f_out:
                 f_out.writelines(f_in)
@@ -72,26 +82,28 @@ def index():
             flash("Please enter a valid 4-character PDB ID #2 or leave blank.", "error")
             return redirect(url_for("index"))
 
-        # process first
+        # Process first structure
         dir1 = os.path.join(OUTPUT_DIR, pdb1)
         os.makedirs(dir1, exist_ok=True)
         try:
             serve1, fmt1, parse1 = download_structure(pdb1, dir1)
         except Exception as e:
-            flash(f"Failed to download {pdb1}: {e}", "error")
+            flash(f"Failed to download PDB {pdb1}: {e}", "error")
             return redirect(url_for("index"))
         path1 = os.path.join(dir1, parse1)
 
-        struct1       = parse_structure(path1)
-        total1, chains1 = count_residues(struct1)
-        seqs1         = get_chain_sequences(struct1)
-        center1       = compute_center_of_mass(struct1)
-        ca1_png       = os.path.join(dir1, f"{pdb1}_ca_scatter.png")
+        struct1, total1, chains1, seqs1, center1, angles1, ca_coords1 = (
+            parse_structure(path1),
+            *count_residues(parse_structure(path1)),
+            get_chain_sequences(parse_structure(path1)),
+            compute_center_of_mass(parse_structure(path1)),
+            get_phi_psi(parse_structure(path1)),
+            get_ca_coordinates(parse_structure(path1)),
+        )
+        ca1_png = os.path.join(dir1, f"{pdb1}_ca_scatter.png")
         plot_ca_scatter(struct1, ca1_png)
-        rama1_png     = os.path.join(dir1, f"{pdb1}_ramachandran.png")
-        plot_ramachandran(get_phi_psi(struct1), rama1_png)
-        angles1       = get_phi_psi(struct1)
-        ca_coords1    = get_ca_coordinates(struct1)
+        rama1_png = os.path.join(dir1, f"{pdb1}_ramachandran.png")
+        plot_ramachandran(angles1, rama1_png)
 
         result_data = {
             "pdb1": pdb1,
@@ -110,28 +122,30 @@ def index():
             "pdb2": None,
         }
 
-        # second
+        # Process second structure if provided
         if pdb2:
             dir2 = os.path.join(OUTPUT_DIR, pdb2)
             os.makedirs(dir2, exist_ok=True)
             try:
                 serve2, fmt2, parse2 = download_structure(pdb2, dir2)
             except Exception as e:
-                flash(f"Failed to download {pdb2}: {e}", "error")
+                flash(f"Failed to download PDB {pdb2}: {e}", "error")
                 return redirect(url_for("index"))
             path2 = os.path.join(dir2, parse2)
 
-            struct2       = parse_structure(path2)
-            total2, chains2 = count_residues(struct2)
-            seqs2         = get_chain_sequences(struct2)
-            center2       = compute_center_of_mass(struct2)
-            ca2_png       = os.path.join(dir2, f"{pdb2}_ca_scatter.png")
+            struct2, total2, chains2, seqs2, center2, angles2, ca_coords2 = (
+                parse_structure(path2),
+                *count_residues(parse_structure(path2)),
+                get_chain_sequences(parse_structure(path2)),
+                compute_center_of_mass(parse_structure(path2)),
+                get_phi_psi(parse_structure(path2)),
+                get_ca_coordinates(parse_structure(path2)),
+            )
+            ca2_png = os.path.join(dir2, f"{pdb2}_ca_scatter.png")
             plot_ca_scatter(struct2, ca2_png)
-            rama2_png     = os.path.join(dir2, f"{pdb2}_ramachandran.png")
-            plot_ramachandran(get_phi_psi(struct2), rama2_png)
-            angles2       = get_phi_psi(struct2)
-            ca_coords2    = get_ca_coordinates(struct2)
-            rmsd_value    = compare_structures(path1, path2, OUTPUT_DIR)
+            rama2_png = os.path.join(dir2, f"{pdb2}_ramachandran.png")
+            plot_ramachandran(angles2, rama2_png)
+            rmsd_value = compare_structures(path1, path2, OUTPUT_DIR)
 
             result_data.update({
                 "pdb2": pdb2,
@@ -167,7 +181,12 @@ def api_metrics(pdb_id):
         struct = parse_structure(path)
         total, chains = count_residues(struct)
         center = compute_center_of_mass(struct).tolist()
-        return {"pdb_id": pdb_id, "total_residues": total, "chains": chains, "center_of_mass": center}
+        return {
+            "pdb_id": pdb_id,
+            "total_residues": total,
+            "chains": chains,
+            "center_of_mass": center,
+        }
     except Exception as e:
         return {"error": str(e)}, 500
 
@@ -182,7 +201,12 @@ def api_mutation_metrics(pdb_id, mutation):
         mut_struct = model_mutation(path, mutation)
         rmsd_val   = compute_mutation_rmsd(wt_struct, mut_struct)
         com_diff   = compute_center_of_mass_difference(wt_struct, mut_struct)
-        return {"pdb_id": pdb_id, "mutation": mutation, "rmsd": rmsd_val, "center_of_mass_diff": com_diff}
+        return {
+            "pdb_id": pdb_id,
+            "mutation": mutation,
+            "rmsd": rmsd_val,
+            "center_of_mass_diff": com_diff,
+        }
     except Exception as e:
         app.logger.exception("Mutation analysis failed")
         return {"error": str(e)}, 500
