@@ -54,6 +54,39 @@
           <a href="{{ pdb1_file_url }}" class="btn btn-outline-secondary btn-sm" download>Download PDB {{ pdb1 }}</a>
         </div>
       </div>
+      <!-- НАЧАЛО: форма для мутаций -->
+      <div class="card shadow-sm mb-5">
+        <div class="card-body">
+          <h5 class="card-title">Mutation Analysis</h5>
+          <form id="mutation-form" class="row g-3">
+            <div class="col-md-2">
+              <label for="chain-select" class="form-label">Chain</label>
+              <select id="chain-select" class="form-select">
+                {% for chain_id in chains1.keys() %}
+                  <option value="{{ chain_id }}">{{ chain_id }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="res-num" class="form-label">Residue #</label>
+              <input type="number" id="res-num" class="form-control" min="1" required>
+            </div>
+            <div class="col-md-2">
+              <label for="orig-aa" class="form-label">Original AA</label>
+              <input type="text" id="orig-aa" class="form-control" maxlength="1" required>
+            </div>
+            <div class="col-md-2">
+              <label for="mut-aa" class="form-label">Mutated AA</label>
+              <input type="text" id="mut-aa" class="form-control" maxlength="1" required>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary" id="analyse-mutation">Analyse Mutation</button>
+            </div>
+          </form>
+          <div id="mutation-result" class="mt-3"></div>
+        </div>
+      </div>
+      <!-- КОНЕЦ: форма для мутаций -->
 
       {% if pdb2 %}
       <!-- Second structure -->
@@ -146,5 +179,17 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
+  <script>
+  window.PDB_ID = "{{ pdb1 }}";
+  </script>
+  <script>
+    window.PDB_ID = "{{ pdb1 }}";
+    window.stage1 = new NGL.Stage('viewer1');
+    stage1.loadFile('{{ pdb1_file_url }}').then(o => {
+      o.addRepresentation('cartoon');
+      stage1.autoView();
+    });
+  </script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

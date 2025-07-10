@@ -218,20 +218,24 @@ def api_metrics(pdb_id):
 def api_mutation_metrics(pdb_id, mutation):
     if not validate_pdb_id(pdb_id):
         return {"error": "invalid pdb id"}, 400
+
     try:
-        pdb_path = download_pdb(pdb_id, out_dir=OUTPUT_DIR)
+        pdb_path   = download_pdb(pdb_id, out_dir=OUTPUT_DIR)
+        wt_struct  = parse_structure(pdb_path)
+        mut_struct = model_mutation(pdb_path, mutation)
+        rmsd_val   = compute_mutation_rmsd(wt_struct, mut_struct)
+        com_diff   = compute_center_of_mass_difference(wt_struct, mut_struct)
+
+        return {
+            "pdb_id": pdb_id,
+            "mutation": mutation,
+            "rmsd": rmsd_val,
+            "center_of_mass_diff": com_diff,
+        }
+
     except Exception as e:
+        app.logger.exception("Mutation analysis failed")
         return {"error": str(e)}, 500
-    wt_struct = parse_structure(pdb_path)
-    mut_struct = model_mutation(pdb_path, mutation)
-    rmsd_val = compute_mutation_rmsd(wt_struct, mut_struct)
-    com_diff = compute_center_of_mass_difference(wt_struct, mut_struct)
-    return {
-        "pdb_id": pdb_id,
-        "mutation": mutation,
-        "rmsd": rmsd_val,
-        "center_of_mass_diff": com_diff,
-    }
 
 if __name__ == "__main__":
     app.run(debug=True)

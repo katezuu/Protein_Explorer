@@ -1,9 +1,7 @@
-Protein Explorer Documentation
-==============================
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
    installation
    usage
    api
@@ -12,8 +10,6 @@ Protein Explorer Documentation
    contributing
    changelog
 
-Indices and tables
-==================
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
