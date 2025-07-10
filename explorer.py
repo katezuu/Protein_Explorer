@@ -22,52 +22,49 @@ matplotlib.use('Agg')
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Bio.PDB import PDBList, PDBParser, PPBuilder, is_aa, Superimposer
+from Bio.PDB import PDBList, PDBParser, PPBuilder, is_aa, Superimposer, MMCIFParser
 from math import degrees
 from Bio.Data.IUPACData import protein_letters_1to3
+from requests import HTTPError
 
+CACHE_EXTENSIONS = ['pdb', 'cif']
 
-
-def download_pdb(pdb_id: str, out_dir: str = ".") -> str:
-    """
-    Download a PDB file by its 4‐character ID from RCSB and save it locally.
-
-    Args:
-        pdb_id: 4-character PDB identifier (e.g., "1AKE").
-        out_dir: Directory in which to save the downloaded PDB.
-
-    Returns:
-        Path to the saved PDB file (e.g., "output_dir/1AKE.pdb").
-
-    Raises:
-        FileNotFoundError: if PDB is not found on RCSB.
-    """
+def download_pdb(pdb_id: str, out_dir: str) -> str:
     pdb_id = pdb_id.upper()
-    print(f"Downloading PDB structure '{pdb_id}'...")
-    url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
-    resp = requests.get(url, timeout=10)
-    resp.raise_for_status()
-    # Сохраняем тоже с заглавными
-    path = os.path.join(out_dir, f"{pdb_id}.pdb")
-    with open(path, "wb") as f:
-        f.write(resp.content)
-    return path
+    os.makedirs(out_dir, exist_ok=True)
+
+    for ext in CACHE_EXTENSIONS:
+        url  = f"https://files.rcsb.org/download/{pdb_id}.{ext}"
+        path = os.path.join(out_dir, f"{pdb_id}.{ext}")
+        try:
+            resp = requests.get(url, timeout=10)
+            resp.raise_for_status()
+            with open(path, "wb") as f:
+                f.write(resp.content)
+            print(f"Downloaded {pdb_id}.{ext} from RCSB")
+            return path
+        except HTTPError as e:
+            # если 404 на .pdb — попробуем следующий ext
+            if resp.status_code == 404:
+                continue
+            else:
+                raise
+    # если ни один ext не сработал
+    raise FileNotFoundError(f"PDB {pdb_id} not found in any supported format (.pdb, .cif)")
 
 
-def parse_structure(file_path: str):
+def parse_structure(path: str):
     """
-    Parse a PDB file into a Biopython Structure object.
-
-    Args:
-        file_path: Path to the local PDB file.
-
-    Returns:
-        A Bio.PDB.Structure.Structure object.
+    Возвращает объект Structure из Bio.PDB по файлу .pdb или .cif
     """
-    parser = PDBParser(QUIET=True)
-    structure_id = os.path.splitext(os.path.basename(file_path))[0]
-    structure = parser.get_structure(structure_id, file_path)
-    return structure
+    ext = os.path.splitext(path)[1].lower()
+    if ext == ".pdb":
+        parser = PDBParser(QUIET=True)
+    elif ext in (".cif", ".mmcif"):
+        parser = MMCIFParser(QUIET=True)
+    else:
+        raise ValueError(f"Unsupported format: {ext}")
+    return parser.get_structure(os.path.basename(path), path)
 
 
 def count_residues(structure) -> (int, dict):
