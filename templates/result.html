@@ -193,7 +193,7 @@
   <script>
     // 3D: Structure 1
     window.PDB_ID_1 = "{{ pdb1 }}";
-    window.stage1 = new NGL.Stage('viewer1');
+    window.stage1   = new NGL.Stage('viewer1');
     {% if fmt1 == 'pdb' %}
       window.stage1.loadFile("{{ url1 }}").then(o => {
         o.addRepresentation("cartoon");

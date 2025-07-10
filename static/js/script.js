@@ -1,10 +1,8 @@
-document.addEventListener("DOMContentLoaded", () => {
-  //
-  // 1) Главная страница: форма PDB → спиннер + валидация
-  //
-  const mainForm      = document.getElementById("pdb-form");
-  const backBtn       = document.getElementById("backToTop");
+// static/js/script.js
 
+document.addEventListener("DOMContentLoaded", () => {
+  // —––– 1) Главная страница: спиннер и валидация —––––
+  const mainForm = document.getElementById("pdb-form");
   if (mainForm) {
     const formContainer = document.getElementById("form-container");
     const spinner       = document.getElementById("spinner-container");
@@ -13,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitBtn     = mainForm.querySelector('button[type="submit"]');
     const RE_PDB        = /^[A-Za-z0-9]{4}$/;
 
-    // Проверка валидности PDB-кодов
     function validateForm() {
       const v1 = pdb1Input.value.trim().toUpperCase();
       const v2 = pdb2Input.value.trim().toUpperCase();
@@ -23,86 +20,74 @@ document.addEventListener("DOMContentLoaded", () => {
     pdb2Input.addEventListener("input", validateForm);
     validateForm();
 
-    // При сабмите → показываем спиннер вместо формы
     mainForm.addEventListener("submit", () => {
-      if (formContainer && spinner) {
-        formContainer.style.display = "none";
-        spinner.style.display       = "flex";
-      }
+      formContainer.style.display = "none";
+      spinner.style.display       = "flex";
     });
   }
 
-  //
-  // 2) Страница результатов: форма мутаций → fetch → подсветка
-  //
-  const mutationForm = document.getElementById("mutation-form");
-  if (mutationForm) {
-    // Параметры формы
-    const chainSelect = document.getElementById("chain-select");
-    const resNumInput = document.getElementById("res-num");
-    const origInput   = document.getElementById("orig-aa");
-    const mutInput    = document.getElementById("mut-aa");
-    const resultDiv   = document.getElementById("mutation-result");
+  // —––– 2) Mutation forms for 1 or 2 structures —––––
+  [1, 2].forEach(i => {
+    const form = document.getElementById(`mutation-form-${i}`);
+    if (!form) return;
+
+    const chainSelect = document.getElementById(`chain-select-${i}`);
+    const resNumInput = document.getElementById(`res-num-${i}`);
+    const origInput   = document.getElementById(`orig-aa-${i}`);
+    const mutInput    = document.getElementById(`mut-aa-${i}`);
+    const resultDiv   = document.getElementById(`mutation-result-${i}`);
     const AA_RE       = /^[A-Za-z]$/;
 
-    mutationForm.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async e => {
       e.preventDefault();
 
-      // берем PDB из глобала (вы выставляете его в result.html)
-      const PDB_ID = window.PDB_ID;
-
-      // собираем строку мутации: A25D
       const chain  = chainSelect.value;
       const resNum = resNumInput.value.trim();
       const origAA = origInput.value.trim().toUpperCase();
       const mutAA  = mutInput.value.trim().toUpperCase();
 
       if (!AA_RE.test(origAA) || !AA_RE.test(mutAA)) {
-        resultDiv.textContent = "Amino acids must be letters";
+        resultDiv.textContent = "Original and Mutated AA must be single letters";
         return;
       }
 
+      const pdbId    = i === 1 ? window.PDB_ID_1 : window.PDB_ID_2;
       const mutation = `${chain}${resNum}${mutAA}`;
+      const url      = `/api/mutation_metrics/${pdbId}/${mutation}`;
 
-      // ваш GET-эндпоинт
-      const url = `/api/mutation_metrics/${PDB_ID}/${mutation}`;
-
-      resultDiv.textContent = "Analyzing...";
+      resultDiv.textContent = "Analyzing mutation…";
 
       try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(resp.statusText);
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || resp.statusText);
+        const resp    = await fetch(url);
+        const payload = await resp.json();
+        if (!resp.ok) throw new Error(payload.error || resp.statusText);
 
-        // Показываем текстовый результат
         resultDiv.innerHTML = `
           <p>
             Mutation: <strong>${mutation}</strong><br>
-            RMSD: <strong>${data.rmsd.toFixed(3)} Å</strong><br>
-            COM shift: <strong>${data.center_of_mass_diff.toFixed(3)} Å</strong>
+            RMSD: <strong>${payload.rmsd.toFixed(3)} Å</strong><br>
+            COM shift: <strong>${payload.center_of_mass_diff.toFixed(3)} Å</strong>
           </p>
         `;
 
-        // Подсветим в NGL
-        if (window.comp1) {
-            window.comp1.addRepresentation("ball+stick", {
-                sele: `${chain} and ${resNum}`,
-                colorValue: 0xFF0000,
-                scale: 2.5
-            });
-  window.stage1.autoView();
-}
+        // highlight in NGL
+        const stage = i === 1 ? window.stage1 : window.stage2;
+        stage.addRepresentation("ball+stick", {
+          sele: `${chain} and ${resNum}`,
+          colorValue: 0xFF0000,
+          scale: 2.5
+        });
+        stage.autoView();
+
       } catch (err) {
         resultDiv.textContent = "Error: " + err.message;
         console.error(err);
       }
     });
-  }
+  });
 
-  //
-  // 3) Back-to-top (универсально для всех страниц)
-  //
+  // —––– 3) Back-to-top —––––
+  const backBtn = document.getElementById("backToTop");
   if (backBtn) {
     window.addEventListener("scroll", () => {
       backBtn.style.display = window.scrollY > 200 ? "block" : "none";
