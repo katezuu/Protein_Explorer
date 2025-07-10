@@ -24,6 +24,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from Bio.PDB import PDBList, PDBParser, PPBuilder, is_aa, Superimposer
 from math import degrees
+from Bio.Data.IUPACData import protein_letters_1to3
+
 
 
 def download_pdb(pdb_id: str, out_dir: str = ".") -> str:
@@ -350,7 +352,11 @@ def model_mutation(pdb_path: str, mutation: str):
     pos = int(mutation[1:-1])
     for residue in struct.get_residues():
         if residue.id[1] == pos:
-            residue.resname = index_to_three(new.upper())
+            res_letter = new.upper()
+            try:
+                residue.resname = protein_letters_1to3[res_letter]
+            except KeyError:
+                raise ValueError(f"Invalid amino‐acid code: {res_letter}")
     return struct
 
 
