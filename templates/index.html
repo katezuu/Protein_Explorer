@@ -58,13 +58,13 @@
               <label for="pdb_id1" class="form-label">PDB ID #1 (required)</label>
               <input  type="text"  class="form-control"
                       id="pdb_id1" name="pdb_id1"
-                      placeholder="e.g., 1AKE" maxlength="4" required />
+                      placeholder="e.g., 1AKE" maxlength="4" pattern="[A-Za-z0-9]{4}" required />
             </div>
             <div class="col-md-6">
               <label for="pdb_id2" class="form-label">PDB ID #2 (optional)</label>
               <input  type="text"  class="form-control"
                       id="pdb_id2" name="pdb_id2"
-                      placeholder="e.g., 2PTC" maxlength="4" />
+                      placeholder="e.g., 2PTC" maxlength="4" pattern="[A-Za-z0-9]{4}" />
               <div class="form-text">Enter a second PDB ID to calculate RMSD</div>
             </div>
             <div class="col-12 text-center">

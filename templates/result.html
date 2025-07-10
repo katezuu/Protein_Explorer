@@ -71,13 +71,13 @@
               <label for="res-num" class="form-label">Residue #</label>
               <input type="number" id="res-num" class="form-control" min="1" required>
             </div>
-            <div class="col-md-2">
-              <label for="orig-aa" class="form-label">Original AA</label>
-              <input type="text" id="orig-aa" class="form-control" maxlength="1" required>
-            </div>
-            <div class="col-md-2">
-              <label for="mut-aa" class="form-label">Mutated AA</label>
-              <input type="text" id="mut-aa" class="form-control" maxlength="1" required>
+              <div class="col-md-2">
+                <label for="orig-aa" class="form-label">Original AA</label>
+                <input type="text" id="orig-aa" class="form-control" maxlength="1" pattern="[A-Za-z]" required>
+              </div>
+              <div class="col-md-2">
+                <label for="mut-aa" class="form-label">Mutated AA</label>
+                <input type="text" id="mut-aa" class="form-control" maxlength="1" pattern="[A-Za-z]" required>
             </div>
             <div class="col-md-2 d-flex align-items-end">
               <button type="submit" class="btn btn-primary" id="analyse-mutation">Analyse Mutation</button>
@@ -152,7 +152,8 @@
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script>
     // NGL Viewer 1
-    const stage1 = new NGL.Stage('viewer1');
+    window.PDB_ID = "{{ pdb1 }}";
+    window.stage1 = new NGL.Stage('viewer1');
     stage1.loadFile('{{ pdb1_file_url }}').then(o => { o.addRepresentation('cartoon'); stage1.autoView(); });
     // Plotly charts for structure 1
     const ca1 = {{ ca_coords1|tojson }};
@@ -177,17 +178,6 @@
     });
     backBtn.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  </script>
-  <script>
-  window.PDB_ID = "{{ pdb1 }}";
-  </script>
-  <script>
-    window.PDB_ID = "{{ pdb1 }}";
-    window.stage1 = new NGL.Stage('viewer1');
-    stage1.loadFile('{{ pdb1_file_url }}').then(o => {
-      o.addRepresentation('cartoon');
-      stage1.autoView();
     });
   </script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>

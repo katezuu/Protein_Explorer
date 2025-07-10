@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const origInput   = document.getElementById("orig-aa");
     const mutInput    = document.getElementById("mut-aa");
     const resultDiv   = document.getElementById("mutation-result");
+    const AA_RE       = /^[A-Za-z]$/;
 
     mutationForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -55,15 +56,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const resNum = resNumInput.value.trim();
       const origAA = origInput.value.trim().toUpperCase();
       const mutAA  = mutInput.value.trim().toUpperCase();
+
+      if (!AA_RE.test(origAA) || !AA_RE.test(mutAA)) {
+        resultDiv.textContent = "Amino acids must be letters";
+        return;
+      }
+
       const mutation = `${chain}${resNum}${mutAA}`;
 
       // ваш GET-эндпоинт
       const url = `/api/mutation_metrics/${PDB_ID}/${mutation}`;
 
+      resultDiv.textContent = "Analyzing...";
+
       try {
         const resp = await fetch(url);
         if (!resp.ok) throw new Error(resp.statusText);
         const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || resp.statusText);
 
         // Показываем текстовый результат
         resultDiv.innerHTML = `
