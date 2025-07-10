@@ -28,28 +28,24 @@
     </h1>
 
     <div class="row mb-5">
-      <!-- First structure -->
+      <!-- Structure 1 -->
       <div class="col-lg-6">
         <div class="card shadow-sm mb-3">
-          <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Structure {{ pdb1 }}</h5>
-          </div>
+          <div class="card-header bg-primary text-white"><h5>Structure {{ pdb1 }}</h5></div>
           <div class="card-body">
             <p><strong>Total Residues:</strong> {{ total1 }}</p>
             <p><strong>Residues per Chain:</strong></p>
             <ul>
-              {% for chain_id, count in chains1.items() %}
-                <li>Chain {{ chain_id }}: {{ count }} residues</li>
-              {% endfor %}
+              {% for c,n in chains1.items() %}<li>Chain {{ c }}: {{ n }}</li>{% endfor %}
             </ul>
             <p><strong>Center of Mass (Cα):</strong> {{ center1 }}</p>
           </div>
         </div>
         <div class="card shadow-sm mb-3">
           <div class="card-body">
-            <div id="viewer1" style="width:100%; height:400px;" class="mb-3"></div>
-            <div id="ca_plot1" style="width:100%; height:300px;" class="mb-3"></div>
-            <div id="rama_plot1" style="width:100%; height:300px;"></div>
+            <div id="viewer1" style="width:100%;height:400px" class="mb-3"></div>
+            <div id="ca_plot1" style="width:100%;height:300px" class="mb-3"></div>
+            <div id="rama_plot1" style="width:100%;height:300px"></div>
           </div>
         </div>
         <div class="text-center mt-3">
@@ -58,30 +54,28 @@
           </a>
         </div>
 
-        <!-- Mutation form for first structure -->
+        <!-- Mutation form 1 -->
         <div class="card shadow-sm mt-4">
           <div class="card-body">
             <h5 class="card-title">Mutation Analysis ({{ pdb1 }})</h5>
             <form id="mutation-form-1" class="row g-3">
               <div class="col-md-3">
-                <label for="chain-select-1" class="form-label">Chain</label>
+                <label class="form-label">Chain</label>
                 <select id="chain-select-1" class="form-select">
-                  {% for chain_id in chains1.keys() %}
-                    <option value="{{ chain_id }}">{{ chain_id }}</option>
-                  {% endfor %}
+                  {% for c in chains1.keys() %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
                 </select>
               </div>
               <div class="col-md-3">
-                <label for="res-num-1" class="form-label">Residue #</label>
+                <label class="form-label">Residue #</label>
                 <input type="number" id="res-num-1" class="form-control" min="1" required>
               </div>
               <div class="col-md-3">
-                <label for="orig-aa-1" class="form-label">Original AA</label>
-                <input type="text" id="orig-aa-1" class="form-control" maxlength="1" pattern="[A-Za-z]" required>
+                <label class="form-label">Original AA</label>
+                <input type="text" id="orig-aa-1" class="form-control" maxlength="1" required>
               </div>
               <div class="col-md-3">
-                <label for="mut-aa-1" class="form-label">Mutated AA</label>
-                <input type="text" id="mut-aa-1" class="form-control" maxlength="1" pattern="[A-Za-z]" required>
+                <label class="form-label">Mutated AA</label>
+                <input type="text" id="mut-aa-1" class="form-control" maxlength="1" required>
               </div>
               <div class="col-12 text-end">
                 <button type="submit" class="btn btn-primary">Analyse Mutation</button>
@@ -93,28 +87,24 @@
       </div>
 
       {% if pdb2 %}
-      <!-- Second structure -->
+      <!-- Structure 2 -->
       <div class="col-lg-6">
         <div class="card shadow-sm mb-3">
-          <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Structure {{ pdb2 }}</h5>
-          </div>
+          <div class="card-header bg-success text-white"><h5>Structure {{ pdb2 }}</h5></div>
           <div class="card-body">
             <p><strong>Total Residues:</strong> {{ total2 }}</p>
             <p><strong>Residues per Chain:</strong></p>
             <ul>
-              {% for chain_id, count in chains2.items() %}
-                <li>Chain {{ chain_id }}: {{ count }} residues</li>
-              {% endfor %}
+              {% for c,n in chains2.items() %}<li>Chain {{ c }}: {{ n }}</li>{% endfor %}
             </ul>
             <p><strong>Center of Mass (Cα):</strong> {{ center2 }}</p>
           </div>
         </div>
         <div class="card shadow-sm mb-3">
           <div class="card-body">
-            <div id="viewer2" style="width:100%; height:400px;" class="mb-3"></div>
-            <div id="ca_plot2" style="width:100%; height:300px;" class="mb-3"></div>
-            <div id="rama_plot2" style="width:100%; height:300px;"></div>
+            <div id="viewer2" style="width:100%;height:400px" class="mb-3"></div>
+            <div id="ca_plot2" style="width:100%;height:300px" class="mb-3"></div>
+            <div id="rama_plot2" style="width:100%;height:300px"></div>
           </div>
         </div>
         <div class="text-center mt-3">
@@ -123,30 +113,28 @@
           </a>
         </div>
 
-        <!-- Mutation form for second structure -->
+        <!-- Mutation form 2 -->
         <div class="card shadow-sm mt-4">
           <div class="card-body">
             <h5 class="card-title">Mutation Analysis ({{ pdb2 }})</h5>
             <form id="mutation-form-2" class="row g-3">
               <div class="col-md-3">
-                <label for="chain-select-2" class="form-label">Chain</label>
+                <label class="form-label">Chain</label>
                 <select id="chain-select-2" class="form-select">
-                  {% for chain_id in chains2.keys() %}
-                    <option value="{{ chain_id }}">{{ chain_id }}</option>
-                  {% endfor %}
+                  {% for c in chains2.keys() %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
                 </select>
               </div>
               <div class="col-md-3">
-                <label for="res-num-2" class="form-label">Residue #</label>
+                <label class="form-label">Residue #</label>
                 <input type="number" id="res-num-2" class="form-control" min="1" required>
               </div>
               <div class="col-md-3">
-                <label for="orig-aa-2" class="form-label">Original AA</label>
-                <input type="text" id="orig-aa-2" class="form-control" maxlength="1" pattern="[A-Za-z]" required>
+                <label class="form-label">Original AA</label>
+                <input type="text" id="orig-aa-2" class="form-control" maxlength="1" required>
               </div>
               <div class="col-md-3">
-                <label for="mut-aa-2" class="form-label">Mutated AA</label>
-                <input type="text" id="mut-aa-2" class="form-control" maxlength="1" pattern="[A-Za-z]" required>
+                <label class="form-label">Mutated AA</label>
+                <input type="text" id="mut-aa-2" class="form-control" maxlength="1" required>
               </div>
               <div class="col-12 text-end">
                 <button type="submit" class="btn btn-primary">Analyse Mutation</button>
@@ -163,27 +151,18 @@
     <div class="row mb-5">
       <div class="col-12">
         <div class="alert alert-info text-center shadow-sm">
-          <h5 class="mb-0">
-            RMSD between <strong>{{ pdb1 }}</strong> and <strong>{{ pdb2 }}</strong>:
-            <span class="fw-bold">{{ "%.3f"|format(rmsd) }} Å</span>
-          </h5>
-          <p class="mb-2">
-            <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm">
-              Analyze Another PDB
-            </a>
-          </p>
+          <h5>RMSD between {{ pdb1 }} &amp; {{ pdb2 }}: {{ "%.3f"|format(rmsd) }} Å</h5>
+          <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm mt-2">Analyze Another</a>
         </div>
       </div>
     </div>
     {% endif %}
 
-    <footer class="text-center text-muted mt-4">
-      &copy; 2025 Protein Structure Explorer
-    </footer>
+    <footer class="text-center text-muted mt-4">&copy; 2025 Protein Structure Explorer</footer>
     <button id="backToTop" class="btn btn-secondary" aria-label="Back to top">&uarr;</button>
   </div>
 
-  <!-- Scripts -->
+  <!-- Dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
           integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
           crossorigin="anonymous"></script>
@@ -191,90 +170,85 @@
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   <script>
-    // 3D: Structure 1
+    // Structure 1
     window.PDB_ID_1 = "{{ pdb1 }}";
     window.stage1   = new NGL.Stage('viewer1');
+    window.comp1    = null;
+
     {% if fmt1 == 'pdb' %}
-      window.stage1.loadFile("{{ url1 }}").then(o => {
-        o.addRepresentation("cartoon");
-        window.stage1.autoView();
-      });
+    window.stage1.loadFile("{{ url1 }}").then(o => {
+      window.comp1 = o;
+      o.addRepresentation("cartoon");
+      window.stage1.autoView();
+    });
     {% elif fmt1 == 'mmcif' %}
-      window.stage1.loadFile("{{ url1 }}", { ext: "mmcif" }).then(o => {
-        o.addRepresentation("cartoon");
-        window.stage1.autoView();
-      });
+    window.stage1.loadFile("{{ url1 }}", { ext: "mmcif" }).then(o => {
+      window.comp1 = o;
+      o.addRepresentation("cartoon");
+      window.stage1.autoView();
+    });
     {% else %}
-      window.stage1.loadFile("{{ url1 }}", { ext: "mmcif", compressed: true }).then(o => {
-        o.addRepresentation("cartoon");
-        window.stage1.autoView();
-      });
+    window.stage1.loadFile("{{ url1 }}", { ext: "mmcif", compressed: true }).then(o => {
+      window.comp1 = o;
+      o.addRepresentation("cartoon");
+      window.stage1.autoView();
+    });
     {% endif %}
 
-    // Plotly charts for structure 1
-    const ca1 = {{ ca_coords1|tojson }};
-    const angles1 = {{ angles1|tojson }};
+    // Plotly for 1
     Plotly.newPlot('ca_plot1', [{
-      x: ca1.map(c => c[0]),
-      y: ca1.map(c => c[1]),
-      z: ca1.map(c => c[2]),
-      mode: 'markers',
-      type: 'scatter3d'
+      x: {{ ca_coords1|map(attribute=0)|list|tojson }},
+      y: {{ ca_coords1|map(attribute=1)|list|tojson }},
+      z: {{ ca_coords1|map(attribute=2)|list|tojson }},
+      mode: 'markers', type: 'scatter3d'
     }]);
     Plotly.newPlot('rama_plot1', [{
-      x: angles1.map(a => a[0]),
-      y: angles1.map(a => a[1]),
-      mode: 'markers',
-      type: 'scatter'
-    }], {
-      xaxis: { title: 'Phi' },
-      yaxis: { title: 'Psi' }
-    });
+      x: {{ angles1|map(attribute=0)|list|tojson }},
+      y: {{ angles1|map(attribute=1)|list|tojson }},
+      mode: 'markers', type: 'scatter'
+    }], { xaxis:{title:'Phi'}, yaxis:{title:'Psi'} });
 
     {% if pdb2 %}
-    // 3D: Structure 2
+    // Structure 2
     window.PDB_ID_2 = "{{ pdb2 }}";
-    const stage2 = new NGL.Stage('viewer2');
+    window.stage2   = new NGL.Stage('viewer2');
+    window.comp2    = null;
+
     {% if fmt2 == 'pdb' %}
-      stage2.loadFile("{{ url2 }}").then(o => {
-        o.addRepresentation("cartoon", { color: 'green' });
-        stage2.autoView();
-      });
+    window.stage2.loadFile("{{ url2 }}").then(o => {
+      window.comp2 = o;
+      o.addRepresentation("cartoon", { color:'green' });
+      window.stage2.autoView();
+    });
     {% elif fmt2 == 'mmcif' %}
-      stage2.loadFile("{{ url2 }}", { ext: "mmcif" }).then(o => {
-        o.addRepresentation("cartoon", { color: 'green' });
-        stage2.autoView();
-      });
+    window.stage2.loadFile("{{ url2 }}", { ext: "mmcif" }).then(o => {
+      window.comp2 = o;
+      o.addRepresentation("cartoon", { color:'green' });
+      window.stage2.autoView();
+    });
     {% else %}
-      stage2.loadFile("{{ url2 }}", { ext: "mmcif", compressed: true }).then(o => {
-        o.addRepresentation("cartoon", { color: 'green' });
-        stage2.autoView();
-      });
+    window.stage2.loadFile("{{ url2 }}", { ext: "mmcif", compressed: true }).then(o => {
+      window.comp2 = o;
+      o.addRepresentation("cartoon", { color:'green' });
+      window.stage2.autoView();
+    });
     {% endif %}
 
-    // Plotly charts for structure 2
-    const ca2 = {{ ca_coords2|tojson }};
-    const angles2 = {{ angles2|tojson }};
+    // Plotly for 2
     Plotly.newPlot('ca_plot2', [{
-      x: ca2.map(c => c[0]),
-      y: ca2.map(c => c[1]),
-      z: ca2.map(c => c[2]),
-      mode: 'markers',
-      type: 'scatter3d'
+      x: {{ ca_coords2|map(attribute=0)|list|tojson }},
+      y: {{ ca_coords2|map(attribute=1)|list|tojson }},
+      z: {{ ca_coords2|map(attribute=2)|list|tojson }},
+      mode: 'markers', type: 'scatter3d'
     }]);
     Plotly.newPlot('rama_plot2', [{
-      x: angles2.map(a => a[0]),
-      y: angles2.map(a => a[1]),
-      mode: 'markers',
-      type: 'scatter'
-    }], {
-      xaxis: { title: 'Phi' },
-      yaxis: { title: 'Psi' }
-    });
+      x: {{ angles2|map(attribute=0)|list|tojson }},
+      y: {{ angles2|map(attribute=1)|list|tojson }},
+      mode: 'markers', type: 'scatter'
+    }], { xaxis:{title:'Phi'}, yaxis:{title:'Psi'} });
     {% endif %}
   </script>
 
-  <!-- External script handles spinner, validation, mutations, back-to-top -->
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
