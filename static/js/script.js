@@ -1,7 +1,5 @@
-// static/js/script.js
-
 document.addEventListener("DOMContentLoaded", () => {
-  // —––– 1) Главная страница: спиннер и валидация —––––
+  // 1) Главная страница: спиннер и валидация
   const mainForm = document.getElementById("pdb-form");
   if (mainForm) {
     const formContainer = document.getElementById("form-container");
@@ -26,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // —––– 2) Mutation forms for 1 or 2 structures —––––
+  // 2) Mutation forms для структуры 1 и 2
   [1, 2].forEach(i => {
     const form = document.getElementById(`mutation-form-${i}`);
     if (!form) return;
@@ -47,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const mutAA  = mutInput.value.trim().toUpperCase();
 
       if (!AA_RE.test(origAA) || !AA_RE.test(mutAA)) {
-        resultDiv.textContent = "Original and Mutated AA must be single letters";
+        resultDiv.textContent = "Amino acids must be single letters";
         return;
       }
 
@@ -70,15 +68,17 @@ document.addEventListener("DOMContentLoaded", () => {
           </p>
         `;
 
-        // highlight in NGL
+        // Подсветка остатка: используем comp1 или comp2
+        const comp = i === 1 ? window.comp1 : window.comp2;
         const stage = i === 1 ? window.stage1 : window.stage2;
-        stage.addRepresentation("ball+stick", {
-          sele: `${chain} and ${resNum}`,
-          colorValue: 0xFF0000,
-          scale: 2.5
-        });
-        stage.autoView();
-
+        if (comp) {
+          comp.addRepresentation("ball+stick", {
+            sele: `${chain} and ${resNum}`,
+            colorValue: 0xFF0000,
+            scale: 2.5
+          });
+          stage.autoView();
+        }
       } catch (err) {
         resultDiv.textContent = "Error: " + err.message;
         console.error(err);
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // —––– 3) Back-to-top —––––
+  // 3) Back-to-top
   const backBtn = document.getElementById("backToTop");
   if (backBtn) {
     window.addEventListener("scroll", () => {
