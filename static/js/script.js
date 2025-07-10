@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 1) Главная страница: спиннер и валидация
+  // 1) Spinner on main form
   const mainForm = document.getElementById("pdb-form");
   if (mainForm) {
     const formContainer = document.getElementById("form-container");
@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const pdb2Input     = document.getElementById("pdb_id2");
     const submitBtn     = mainForm.querySelector('button[type="submit"]');
     const RE_PDB        = /^[A-Za-z0-9]{4}$/;
-
     function validateForm() {
       const v1 = pdb1Input.value.trim().toUpperCase();
       const v2 = pdb2Input.value.trim().toUpperCase();
@@ -17,15 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
     pdb1Input.addEventListener("input", validateForm);
     pdb2Input.addEventListener("input", validateForm);
     validateForm();
-
     mainForm.addEventListener("submit", () => {
       formContainer.style.display = "none";
       spinner.style.display       = "flex";
     });
   }
 
-  // 2) Mutation forms для структуры 1 и 2
-  [1, 2].forEach(i => {
+  // 2) Mutation forms
+  [1,2].forEach(i => {
     const form = document.getElementById(`mutation-form-${i}`);
     if (!form) return;
 
@@ -43,13 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const resNum = resNumInput.value.trim();
       const origAA = origInput.value.trim().toUpperCase();
       const mutAA  = mutInput.value.trim().toUpperCase();
-
       if (!AA_RE.test(origAA) || !AA_RE.test(mutAA)) {
         resultDiv.textContent = "Amino acids must be single letters";
         return;
       }
 
-      const pdbId    = i === 1 ? window.PDB_ID_1 : window.PDB_ID_2;
+      const pdbId    = i===1 ? window.PDB_ID_1 : window.PDB_ID_2;
       const mutation = `${chain}${resNum}${mutAA}`;
       const url      = `/api/mutation_metrics/${pdbId}/${mutation}`;
 
@@ -68,18 +65,18 @@ document.addEventListener("DOMContentLoaded", () => {
           </p>
         `;
 
-        // Подсветка остатка: используем comp1 или comp2
-        const comp = i === 1 ? window.comp1 : window.comp2;
-        const stage = i === 1 ? window.stage1 : window.stage2;
+        // highlight using component
+        const comp  = i===1 ? window.comp1 : window.comp2;
+        const stage = i===1 ? window.stage1 : window.stage2;
         if (comp) {
           comp.addRepresentation("ball+stick", {
-            sele: `${chain} and ${resNum}`,
+            sele: `${resNum} and :${chain}`,
             colorValue: 0xFF0000,
             scale: 2.5
           });
           stage.autoView();
         }
-      } catch (err) {
+      } catch(err) {
         resultDiv.textContent = "Error: " + err.message;
         console.error(err);
       }
@@ -89,11 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3) Back-to-top
   const backBtn = document.getElementById("backToTop");
   if (backBtn) {
-    window.addEventListener("scroll", () => {
-      backBtn.style.display = window.scrollY > 200 ? "block" : "none";
+    window.addEventListener("scroll", ()=> {
+      backBtn.style.display = window.scrollY>200 ? "block" : "none";
     });
-    backBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    backBtn.addEventListener("click", ()=> {
+      window.scrollTo({top:0,behavior:"smooth"});
     });
   }
 });

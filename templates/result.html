@@ -11,32 +11,30 @@
     crossorigin="anonymous">
   <style>
     html { scroll-behavior: smooth; }
-    #backToTop {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      display: none;
-    }
+    #backToTop { position: fixed; bottom: 40px; right: 40px; display: none; }
   </style>
 </head>
 <body class="bg-light">
   <div class="container py-5">
-    <h1 class="mb-4 text-center">
-      Analysis Results: {{ pdb1 }}{% if pdb2 %}
-        <span class="text-secondary">&amp; {{ pdb2 }}</span>
-      {% endif %}
-    </h1>
+    <div class="d-flex align-items-center justify-content-center mb-4">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           alt="Logo" style="height:40px; margin-right:10px;">
+      <h1 class="mb-0 text-center">
+        Analysis Results: {{ pdb1 }}{% if pdb2 %} &amp; {{ pdb2 }}{% endif %}
+      </h1>
+    </div>
 
     <div class="row mb-5">
       <!-- Structure 1 -->
       <div class="col-lg-6">
         <div class="card shadow-sm mb-3">
-          <div class="card-header bg-primary text-white"><h5>Structure {{ pdb1 }}</h5></div>
+          <div class="card-header bg-primary text-white"><h5>{{ pdb1 }}</h5></div>
           <div class="card-body">
             <p><strong>Total Residues:</strong> {{ total1 }}</p>
-            <p><strong>Residues per Chain:</strong></p>
             <ul>
-              {% for c,n in chains1.items() %}<li>Chain {{ c }}: {{ n }}</li>{% endfor %}
+              {% for c,n in chains1.items() %}
+                <li>Chain {{ c }}: {{ n }}</li>
+              {% endfor %}
             </ul>
             <p><strong>Center of Mass (Cα):</strong> {{ center1 }}</p>
           </div>
@@ -54,7 +52,7 @@
           </a>
         </div>
 
-        <!-- Mutation form 1 -->
+        <!-- Mutation form for structure 1 -->
         <div class="card shadow-sm mt-4">
           <div class="card-body">
             <h5 class="card-title">Mutation Analysis ({{ pdb1 }})</h5>
@@ -62,7 +60,7 @@
               <div class="col-md-3">
                 <label class="form-label">Chain</label>
                 <select id="chain-select-1" class="form-select">
-                  {% for c in chains1.keys() %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+                  {% for c in chains1.keys() %}<option>{{ c }}</option>{% endfor %}
                 </select>
               </div>
               <div class="col-md-3">
@@ -90,10 +88,9 @@
       <!-- Structure 2 -->
       <div class="col-lg-6">
         <div class="card shadow-sm mb-3">
-          <div class="card-header bg-success text-white"><h5>Structure {{ pdb2 }}</h5></div>
+          <div class="card-header bg-success text-white"><h5>{{ pdb2 }}</h5></div>
           <div class="card-body">
             <p><strong>Total Residues:</strong> {{ total2 }}</p>
-            <p><strong>Residues per Chain:</strong></p>
             <ul>
               {% for c,n in chains2.items() %}<li>Chain {{ c }}: {{ n }}</li>{% endfor %}
             </ul>
@@ -113,7 +110,7 @@
           </a>
         </div>
 
-        <!-- Mutation form 2 -->
+        <!-- Mutation form for structure 2 -->
         <div class="card shadow-sm mt-4">
           <div class="card-body">
             <h5 class="card-title">Mutation Analysis ({{ pdb2 }})</h5>
@@ -121,7 +118,7 @@
               <div class="col-md-3">
                 <label class="form-label">Chain</label>
                 <select id="chain-select-2" class="form-select">
-                  {% for c in chains2.keys() %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+                  {% for c in chains2.keys() %}<option>{{ c }}</option>{% endfor %}
                 </select>
               </div>
               <div class="col-md-3">
@@ -151,8 +148,10 @@
     <div class="row mb-5">
       <div class="col-12">
         <div class="alert alert-info text-center shadow-sm">
-          <h5>RMSD between {{ pdb1 }} &amp; {{ pdb2 }}: {{ "%.3f"|format(rmsd) }} Å</h5>
-          <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm mt-2">Analyze Another</a>
+          <h5>RMSD: {{ "%.3f"|format(rmsd) }} Å</h5>
+          <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm mt-2">
+            Analyze Another
+          </a>
         </div>
       </div>
     </div>
@@ -162,7 +161,6 @@
     <button id="backToTop" class="btn btn-secondary" aria-label="Back to top">&uarr;</button>
   </div>
 
-  <!-- Dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
           integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
           crossorigin="anonymous"></script>
@@ -170,82 +168,52 @@
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   <script>
-    // Structure 1
-    window.PDB_ID_1 = "{{ pdb1 }}";
-    window.stage1   = new NGL.Stage('viewer1');
-    window.comp1    = null;
+    // load and store component for structure 1
+    window.stage1 = new NGL.Stage("viewer1");
+    window.comp1  = null;
+    window.stage1.loadFile("{{ url1 }}"{% if fmt1!="pdb" %}, {{ fmt1=="mmcif_gz" ? "{ ext:'mmcif',compressed:true }" : "{ ext:'mmcif' }" }}{% endif %})
+      .then(c => {
+        window.comp1 = c;
+        c.addRepresentation("cartoon");
+        window.stage1.autoView();
+      });
 
-    {% if fmt1 == 'pdb' %}
-    window.stage1.loadFile("{{ url1 }}").then(o => {
-      window.comp1 = o;
-      o.addRepresentation("cartoon");
-      window.stage1.autoView();
-    });
-    {% elif fmt1 == 'mmcif' %}
-    window.stage1.loadFile("{{ url1 }}", { ext: "mmcif" }).then(o => {
-      window.comp1 = o;
-      o.addRepresentation("cartoon");
-      window.stage1.autoView();
-    });
-    {% else %}
-    window.stage1.loadFile("{{ url1 }}", { ext: "mmcif", compressed: true }).then(o => {
-      window.comp1 = o;
-      o.addRepresentation("cartoon");
-      window.stage1.autoView();
-    });
-    {% endif %}
-
-    // Plotly for 1
-    Plotly.newPlot('ca_plot1', [{
+    // plot charts 1
+    Plotly.newPlot("ca_plot1", [{
       x: {{ ca_coords1|map(attribute=0)|list|tojson }},
       y: {{ ca_coords1|map(attribute=1)|list|tojson }},
       z: {{ ca_coords1|map(attribute=2)|list|tojson }},
-      mode: 'markers', type: 'scatter3d'
+      mode: "markers", type: "scatter3d"
     }]);
-    Plotly.newPlot('rama_plot1', [{
+    Plotly.newPlot("rama_plot1", [{
       x: {{ angles1|map(attribute=0)|list|tojson }},
       y: {{ angles1|map(attribute=1)|list|tojson }},
-      mode: 'markers', type: 'scatter'
-    }], { xaxis:{title:'Phi'}, yaxis:{title:'Psi'} });
+      mode: "markers", type: "scatter"
+    }], { xaxis:{title:"Phi"}, yaxis:{title:"Psi"} });
 
     {% if pdb2 %}
-    // Structure 2
-    window.PDB_ID_2 = "{{ pdb2 }}";
-    window.stage2   = new NGL.Stage('viewer2');
-    window.comp2    = null;
+    // load and store component for structure 2
+    window.stage2 = new NGL.Stage("viewer2");
+    window.comp2  = null;
+    window.stage2.loadFile("{{ url2 }}"{% if fmt2!="pdb" %}, {{ fmt2=="mmcif_gz" ? "{ ext:'mmcif',compressed:true }" : "{ ext:'mmcif' }" }}{% endif %})
+      .then(c => {
+        window.comp2 = c;
+        c.addRepresentation("cartoon", { color:"green" });
+        window.stage2.autoView();
+      });
 
-    {% if fmt2 == 'pdb' %}
-    window.stage2.loadFile("{{ url2 }}").then(o => {
-      window.comp2 = o;
-      o.addRepresentation("cartoon", { color:'green' });
-      window.stage2.autoView();
-    });
-    {% elif fmt2 == 'mmcif' %}
-    window.stage2.loadFile("{{ url2 }}", { ext: "mmcif" }).then(o => {
-      window.comp2 = o;
-      o.addRepresentation("cartoon", { color:'green' });
-      window.stage2.autoView();
-    });
-    {% else %}
-    window.stage2.loadFile("{{ url2 }}", { ext: "mmcif", compressed: true }).then(o => {
-      window.comp2 = o;
-      o.addRepresentation("cartoon", { color:'green' });
-      window.stage2.autoView();
-    });
-    {% endif %}
-
-    // Plotly for 2
-    Plotly.newPlot('ca_plot2', [{
+    // plot charts 2
+    Plotly.newPlot("ca_plot2", [{
       x: {{ ca_coords2|map(attribute=0)|list|tojson }},
       y: {{ ca_coords2|map(attribute=1)|list|tojson }},
       z: {{ ca_coords2|map(attribute=2)|list|tojson }},
-      mode: 'markers', type: 'scatter3d'
+      mode: "markers", type: "scatter3d"
     }]);
-    Plotly.newPlot('rama_plot2', [{
+    Plotly.newPlot("rama_plot2", [{
       x: {{ angles2|map(attribute=0)|list|tojson }},
       y: {{ angles2|map(attribute=1)|list|tojson }},
-      mode: 'markers', type: 'scatter'
-    }], { xaxis:{title:'Phi'}, yaxis:{title:'Psi'} });
+      mode: "markers", type: "scatter"
+    }], { xaxis:{title:"Phi"}, yaxis:{title:"Psi"} });
     {% endif %}
   </script>
 
