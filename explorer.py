@@ -26,31 +26,97 @@ from Bio.PDB import PDBList, PDBParser, PPBuilder, is_aa, Superimposer, MMCIFPar
 from math import degrees
 from Bio.Data.IUPACData import protein_letters_1to3
 from requests import HTTPError
+import os
+import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+import gzip
 
+CACHE_DIR = os.path.join(os.path.dirname(__file__), "data", "cifs")
+os.makedirs(CACHE_DIR, exist_ok=True)
 CACHE_EXTENSIONS = ['pdb', 'cif']
+
+
+def download_structure(pdb_id: str, out_dir: str):
+    """
+    Try to download mmCIF (and gzip it), otherwise fall back to PDB.
+    Returns tuple: (filename, format), where format is 'mmcif' or 'pdb'.
+    """
+    # попробуем CIF
+    try:
+        cif_path = download_cif(pdb_id, out_dir)
+        gz_path  = cif_path + ".gz"
+        # если есть сжатый, отдадим его
+        if os.path.exists(gz_path):
+            return (os.path.basename(gz_path), 'mmcif_gz')
+        else:
+            return (os.path.basename(cif_path), 'mmcif')
+    except Exception:
+        # fallback на PDB
+        pdb_path = download_pdb(pdb_id, out_dir)
+        return (os.path.basename(pdb_path), 'pdb')
+
+
+def download_cif(pdb_id: str, out_dir: str) -> str:
+    pdb_id = pdb_id.upper()
+    # локальный кэш .cif
+    cache_cif = os.path.join(CACHE_DIR, f"{pdb_id}.cif")
+    cache_gz  = cache_cif + ".gz"
+    if os.path.exists(cache_cif) and os.path.exists(cache_gz):
+        return cache_cif  # вернём путь к оригиналу
+
+    # ретраи
+    session = requests.Session()
+    retries = Retry(total=5, backoff_factor=1,
+                    status_forcelist=[429,500,502,503,504],
+                    allowed_methods=["GET"])
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+
+    url = f"https://files.rcsb.org/download/{pdb_id}.cif"
+    resp = session.get(url, timeout=30)
+    resp.raise_for_status()
+
+    # сохраняем в out_dir
+    os.makedirs(out_dir, exist_ok=True)
+    out_cif = os.path.join(out_dir, f"{pdb_id}.cif")
+    with open(out_cif, "wb") as f:
+        f.write(resp.content)
+    # кэшируем
+    with open(cache_cif, "wb") as f:
+        f.write(resp.content)
+    # и зипуем для клиентского NGL
+    with gzip.open(cache_gz, "wb") as gz:
+        gz.write(resp.content)
+
+    return out_cif
 
 def download_pdb(pdb_id: str, out_dir: str) -> str:
     pdb_id = pdb_id.upper()
-    os.makedirs(out_dir, exist_ok=True)
+    # папка кэша
+    local = os.path.join(CACHE_DIR, f"{pdb_id}.cif")
+    if os.path.exists(local):
+        return local
 
-    for ext in CACHE_EXTENSIONS:
-        url  = f"https://files.rcsb.org/download/{pdb_id}.{ext}"
-        path = os.path.join(out_dir, f"{pdb_id}.{ext}")
-        try:
-            resp = requests.get(url, timeout=10)
-            resp.raise_for_status()
-            with open(path, "wb") as f:
-                f.write(resp.content)
-            print(f"Downloaded {pdb_id}.{ext} from RCSB")
-            return path
-        except HTTPError as e:
-            # если 404 на .pdb — попробуем следующий ext
-            if resp.status_code == 404:
-                continue
-            else:
-                raise
-    # если ни один ext не сработал
-    raise FileNotFoundError(f"PDB {pdb_id} not found in any supported format (.pdb, .cif)")
+    session = requests.Session()
+    # ... настройки retry как раньше ...
+
+    url = f"https://files.rcsb.org/download/{pdb_id}.cif"
+    resp = session.get(url, timeout=30)
+    resp.raise_for_status()
+
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, f"{pdb_id}.cif")
+    cif_gz = out_path + ".gz"
+    with open(out_path, "rb") as f_in, gzip.open(cif_gz, "wb") as f_out:
+        f_out.writelines(f_in)
+     # возвращаем .cif, но шаблон может подхватывать .cif.gz
+    with open(out_path, "wb") as f:
+        f.write(resp.content)
+    # сохраняем в кэш
+    with open(local, "wb") as f:
+        f.write(resp.content)
+    return out_path
 
 
 def parse_structure(path: str):
