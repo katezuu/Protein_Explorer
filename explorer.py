@@ -42,22 +42,16 @@ def download_pdb(pdb_id: str, out_dir: str = ".") -> str:
     Raises:
         FileNotFoundError: if PDB is not found on RCSB.
     """
-    pdbl = PDBList()
-    # retrieve_pdb_file writes something like "pdb1ake.ent" by default
-    filepath = pdbl.retrieve_pdb_file(pdb_id, pdir=out_dir, file_format="pdb")
-    if not filepath or not os.path.exists(filepath):
-        raise FileNotFoundError(f"PDB {pdb_id} not found on RCSB.")
-
-    # Rename the file to "<pdb_id>.pdb"
-    base_name = os.path.basename(filepath)
-    new_name = f"{pdb_id}.pdb"
-    new_path = os.path.join(out_dir, new_name)
-
-    # Remove if a file with that name already exists
-    if os.path.exists(new_path):
-        os.remove(new_path)
-    os.rename(filepath, new_path)
-    return new_path
+    pdb_id = pdb_id.upper()
+    print(f"Downloading PDB structure '{pdb_id}'...")
+    url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+    resp = requests.get(url, timeout=10)
+    resp.raise_for_status()
+    # Сохраняем тоже с заглавными
+    path = os.path.join(out_dir, f"{pdb_id}.pdb")
+    with open(path, "wb") as f:
+        f.write(resp.content)
+    return path
 
 
 def parse_structure(file_path: str):
