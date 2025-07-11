@@ -1,14 +1,19 @@
+from explorer import get_phi_psi, fetch_uniprot_variants
+from mutation import model_mutation
+from metrics import compare_structures, compute_mutation_rmsd
+from plotting import plot_ca_scatter, plot_ramachandran
+from io_utils import parse_structure
 import os
 import sys
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            '..')))
 
-from io_utils import parse_structure
-from plotting import plot_ca_scatter, plot_ramachandran
-from metrics import compare_structures, compute_mutation_rmsd
-from mutation import model_mutation
-from explorer import get_phi_psi, fetch_uniprot_variants
 
 PDB_CONTENT1 = """\
 ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N
@@ -34,6 +39,7 @@ ATOM      2  CA  ALA B   1       0.000   0.000   0.000  1.00  0.00           C
 TER
 END
 """
+
 
 def write_pdb(content, dirpath, name):
     path = os.path.join(dirpath, name)
@@ -77,12 +83,16 @@ def test_fetch_uniprot_variants(monkeypatch):
     class FakeResp:
         def __init__(self, data):
             self._data = data
+
         def json(self):
             return self._data
+
         def raise_for_status(self):
             pass
+
     def fake_get(url, timeout=10):
-        return FakeResp({'features': [{'type': 'VARIANT', 'location': {'start': 1}, 'description': 'mut'}]})
+        return FakeResp({'features': [{'type': 'VARIANT', 'location': {
+                        'start': 1}, 'description': 'mut'}]})
     monkeypatch.setattr('requests.get', fake_get)
     variants = fetch_uniprot_variants('P01234')
     assert variants and variants[0]['position'] == 1

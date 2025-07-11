@@ -72,7 +72,9 @@ def create_app() -> Flask:
                 flash("Please enter a valid 4-character PDB ID #1.", "error")
                 return redirect(url_for("index"))
             if pdb2 and not validate_pdb_id(pdb2):
-                flash("Please enter a valid 4-character PDB ID #2 or leave blank.", "error")
+                flash(
+                    "Please enter a valid 4-character PDB ID #2 or leave blank.",
+                    "error")
                 return redirect(url_for("index"))
 
             dir1 = os.path.join(output_dir, pdb1)
@@ -96,13 +98,22 @@ def create_app() -> Flask:
                 "pdb1": pdb1,
                 "serve1": serve1,
                 "fmt1": fmt1,
-                "url1": url_for("serve_file", pdb_id=pdb1, filename=serve1),
+                "url1": url_for(
+                    "serve_file",
+                    pdb_id=pdb1,
+                    filename=serve1),
                 "total1": total1,
                 "chains1": chains1,
                 "seqs1": seqs1,
                 "center1": center1,
-                "ca1_url": url_for("serve_file", pdb_id=pdb1, filename=f"{pdb1}_ca_scatter.png"),
-                "rama1_url": url_for("serve_file", pdb_id=pdb1, filename=f"{pdb1}_ramachandran.png"),
+                "ca1_url": url_for(
+                    "serve_file",
+                    pdb_id=pdb1,
+                    filename=f"{pdb1}_ca_scatter.png"),
+                "rama1_url": url_for(
+                    "serve_file",
+                    pdb_id=pdb1,
+                    filename=f"{pdb1}_ramachandran.png"),
                 "angles1": angles1,
                 "ca_coords1": ca_coords1,
                 "rmsd": None,
@@ -150,14 +161,19 @@ def create_app() -> Flask:
 
     @app.route("/outputs/<pdb_id>/<filename>")
     def serve_file(pdb_id, filename):
-        return send_from_directory(os.path.join(app.config["OUTPUT_DIR"], pdb_id), filename)
+        return send_from_directory(
+            os.path.join(
+                app.config["OUTPUT_DIR"],
+                pdb_id),
+            filename)
 
     @app.route("/api/metrics/<pdb_id>")
     def api_metrics(pdb_id):
         if not validate_pdb_id(pdb_id):
             return {"error": "invalid pdb id"}, 400
         try:
-            serve, fmt, parse = _download_structure(pdb_id, out_dir=app.config["OUTPUT_DIR"])
+            serve, fmt, parse = _download_structure(
+                pdb_id, out_dir=app.config["OUTPUT_DIR"])
             path = os.path.join(app.config["OUTPUT_DIR"], pdb_id, parse)
             struct = parse_structure(path)
             total, chains = count_residues(struct)
@@ -176,7 +192,8 @@ def create_app() -> Flask:
         if not validate_pdb_id(pdb_id):
             return {"error": "invalid pdb id"}, 400
         try:
-            serve, fmt, parse = _download_structure(pdb_id, out_dir=app.config["OUTPUT_DIR"])
+            serve, fmt, parse = _download_structure(
+                pdb_id, out_dir=app.config["OUTPUT_DIR"])
             path = os.path.join(app.config["OUTPUT_DIR"], pdb_id, parse)
             wt_struct = parse_structure(path)
             mut_struct = model_mutation(path, mutation)

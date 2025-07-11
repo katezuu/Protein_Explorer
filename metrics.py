@@ -6,7 +6,8 @@ from io_utils import parse_structure
 
 
 def compute_center_of_mass(structure) -> np.ndarray:
-    coords = [atom.get_coord() for atom in structure.get_atoms() if atom.get_id() == "CA"]
+    coords = [atom.get_coord()
+              for atom in structure.get_atoms() if atom.get_id() == "CA"]
     if not coords:
         return np.array([np.nan, np.nan, np.nan])
     return np.mean(coords, axis=0)
@@ -62,10 +63,12 @@ def compute_mutation_rmsd(wt_struct, mut_struct, mutation: str) -> float:
         res1 = model1[chain_id][resnum]
         res2 = model2[chain_id][resnum]
     except KeyError:
-        raise ValueError(f"Residue {chain_id}{resnum} not found in one of structures")
+        raise ValueError(
+            f"Residue {chain_id}{resnum} not found in one of structures")
 
     bb = {"N", "CA", "C", "O"}
-    atoms1 = [a for a in res1 if a.get_id() not in bb and a.get_id() in {b.get_id() for b in res2}]
+    atoms1 = [a for a in res1 if a.get_id() not in bb and a.get_id()
+              in {b.get_id() for b in res2}]
     atoms2 = [res2[a.get_id()] for a in atoms1]
 
     if not atoms1:

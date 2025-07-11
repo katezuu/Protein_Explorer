@@ -40,7 +40,8 @@ def get_chain_sequences(structure) -> dict:
 
 
 def get_ca_coordinates(structure) -> list:
-    return [atom.get_coord().tolist() for atom in structure.get_atoms() if atom.get_id() == "CA"]
+    return [atom.get_coord().tolist()
+            for atom in structure.get_atoms() if atom.get_id() == "CA"]
 
 
 def get_phi_psi(structure) -> list:

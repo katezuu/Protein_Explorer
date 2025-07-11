@@ -11,7 +11,8 @@ def model_mutation(pdb_path: str, mutation: str):
 
     theta = np.deg2rad(45.0)
     axis = np.array([0.0, 0.0, 1.0])
-    K = np.array([[0, -axis[2], axis[1]], [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]])
+    K = np.array([[0, -axis[2], axis[1]],
+                  [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]])
     R = np.eye(3) + np.sin(theta) * K + (1 - np.cos(theta)) * (K @ K)
 
     for residue in struct.get_residues():
