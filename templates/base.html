@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Protein Structure Explorer{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <style>
+    html { scroll-behavior: smooth; }
+    #backToTop { position: fixed; bottom: 40px; right: 40px; display: none; }
+  </style>
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-light bg-light mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height:40px; margin-right:5px;">
+      Protein Explorer
+    </a>
+  </div>
+</nav>
+<div class="container py-5">
+{% block content %}{% endblock %}
+  <button id="backToTop" class="btn btn-secondary" aria-label="Back to top">&uarr;</button>
+  <footer class="text-center text-muted mt-4">&copy; 2025 Protein Structure Explorer</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,10 +1,20 @@
 Code API
 ========
-.. automodule:: explorer
-   :members:
-   :undoc-members:
 
-.. automodule:: app
+.. autosummary::
+   :toctree: generated
+
+   io_utils
+   metrics
+   plotting
+   mutation
+
+.. automodule:: io_utils
    :members:
-   :undoc-members:
+.. automodule:: metrics
+   :members:
+.. automodule:: plotting
+   :members:
+.. automodule:: mutation
+   :members:
 
