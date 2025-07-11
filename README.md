@@ -5,70 +5,93 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/katezu/protein-explorer.svg)](https://hub.docker.com/r/katezu/protein-explorer)
 [![Docs](https://img.shields.io/website?url=https%3A%2F%2Fkatezuu.github.io%2FProtein_Explorer%2F)](https://katezuu.github.io/Protein_Explorer/)
 
+**Protein Structure Explorer** is a small web app that lets you fetch any entry from the RCSB PDB, view the 3‑D structure directly in the browser, and run quick exploratory analyses — C‑alpha scatter, Ramachandran maps, pairwise RMSD and single‑point mutation metrics.
 
-## Overview
-
-**Protein Structure Explorer** is a Python-based CLI and web application for:
-
-- Downloading and parsing protein structures from the RCSB PDB.
-- Computing basic metrics: residue count, per‐chain counts, amino acid sequences, center of mass (Cα), φ/ψ angles.
-- Plotting static 3D scatter (Cα) and Ramachandran plots (φ vs. ψ).
-- Comparing two structures by Cα RMSD.
-- Serving a simple Flask web interface (with form validation, Bootstrap 5 styling) and REST-like API endpoints.
-- Containerizing with Docker and running CI via GitHub Actions (pytest).
+![screenshot](docs/_static/images/cover.png)
 
 ---
 
-## Repository Structure
+##Key Features
 
-
-- `explorer.py` — Core functions for parsing PDB, computing metrics, plotting, and RMSD.
-- `app.py` — Flask application: routes, form validation, result rendering.
-- `templates/` — Jinja2 templates (`index.html`, `result.html`).
-- `requirements.txt` — Python dependencies.
-- `Dockerfile` — Instructions to build a Docker image.
-- `Procfile` — For Heroku/Render to launch Gunicorn.
-- `pytest.ini` — pytest configuration.
-- `.github/workflows/ci.yml` — GitHub Actions workflow (CI).
-- `tests/` — Unit tests (pytest) for both `explorer.py` and `app.py`.
-- `LICENSE` — MIT License.
+* **Instant fetch** of both `.pdb` **and** `.cif/mmCIF` (with caching & automatic retries).  
+* Interactive 3‑D viewer powered by **NGL**.  
+* Built‑in charts (**Plotly**) – Cα scatter (3‑D) & Ramachandran plot.  
+* **Pairwise alignment & RMSD** for any two PDB IDs.  
+* **Single‑point mutation** modelling with RMSD & COM‑shift, highlighted in the viewer.  
+* Simple **REST API** endpoints.  
+* **Sphinx** documentation & auto‑generated API reference.  
+* Ready for **Docker** / CI / GitHub Pages deployment.
 
 ---
 
-## Quick Start (Local / CLI)
+## Quick Start
 
-1. **Clone or copy** this repository to your local machine.
-2. **Navigate** to the project directory:
-   ```bash
-   cd Protein_Explorer
+```bash
+git clone https://github.com/katezuu/Protein_Explorer.git
+cd Protein_Explorer
+python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+flask --app app run            # open http://127.0.0.1:5000
+```
 
-3. Install dependencies and run:
-   ```bash
-   pip install -r requirements.txt
-   flask run
-   ```
+---
 
-## Mutation Analysis Features
+## Project Layout
 
-- `/mutations` form to submit a PDB ID and mutation code.
-- `/analyze_mutation` performs simple in-memory modeling of the mutation and displays RMSD and center-of-mass shift.
-- REST endpoints `/api/metrics/<pdb_id>` and `/api/mutation_metrics/<pdb_id>/<mutation>` return JSON metrics.
+```
+Protein_Explorer/
+├── app.py               # Flask routes / API
+├── explorer.py          # I/O, metrics, plotting, mutation (monolith)
+├── templates/           # index.html, result.html
+├── static/js/script.js  # client‑side logic
+├── docs/                # Sphinx sources
+├── tests/               # pytest suite
+├── Dockerfile / Procfile
+└── .github/workflows/ci.yml
+```
 
-## Interactive Visualization
+---
 
-- Results pages embed the NGL viewer to explore structures in 3D.
-- Plotly charts show interactive Cα scatter and Ramachandran plots with zoom and hover capabilities.
+## Documentation
 
-## Frontend Dependencies
+Inside `docs/`:
 
-This project loads the following libraries from CDNs:
+```bash
+cd docs
+make html          # outputs to docs/_build/html
+```
 
-- **NGL Viewer** for 3D visualization
-- **Plotly.js** for interactive charts
-- **Bootstrap 5** for UI styling
+Set up **GitHub Pages** to serve `gh-pages` branch or enable the provided workflow.
 
-## Notebooks & Reports
-- 📓 `notebooks/dataset_analysis.ipynb`
-- 📄 `reports/dataset_analysis.pdf`
-- 💾 `results/dataset_metrics.csv`
+---
 
+## Testing
+
+```bash
+pytest -q
+```
+
+---
+
+## Docker
+
+```bash
+docker build -t protein-explorer .
+docker run -p 5000:5000 protein-explorer
+```
+
+---
+
+## Acknowledgements
+
+* **RCSB PDB** data.  
+* **BioPython** for parsing PDB / mmCIF.  
+* **NGL** for WebGL rendering.  
+* **Plotly** for the interactive charts.  
+* **Bootstrap 5** for UI components.
+
+---
+
+## License
+
+Released under the MIT License – see [`LICENSE`](LICENSE) for details.
