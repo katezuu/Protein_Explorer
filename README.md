@@ -7,7 +7,7 @@
 
 **Protein Structure Explorer** is a small web app that lets you fetch any entry from the RCSB PDB, view the 3‑D structure directly in the browser, and run quick exploratory analyses — C‑alpha scatter, Ramachandran maps, pairwise RMSD and single‑point mutation metrics.
 
-![screenshot](docs/_static/images/cover.png)
+![screenshot](docs/_static/cover.png)
 
 ---
 
