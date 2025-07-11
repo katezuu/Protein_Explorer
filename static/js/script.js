@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 1) Spinner on main form
+  // 1) Spinner & validation on main form
   const mainForm = document.getElementById("pdb-form");
   if (mainForm) {
     const formContainer = document.getElementById("form-container");
@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pdb2Input     = document.getElementById("pdb_id2");
     const submitBtn     = mainForm.querySelector('button[type="submit"]');
     const RE_PDB        = /^[A-Za-z0-9]{4}$/;
+
     function validateForm() {
       const v1 = pdb1Input.value.trim().toUpperCase();
       const v2 = pdb2Input.value.trim().toUpperCase();
@@ -16,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pdb1Input.addEventListener("input", validateForm);
     pdb2Input.addEventListener("input", validateForm);
     validateForm();
+
     mainForm.addEventListener("submit", () => {
       formContainer.style.display = "none";
       spinner.style.display       = "flex";
@@ -23,20 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 2) Mutation forms
-  [1,2].forEach(i => {
+  [1, 2].forEach(i => {
     const form = document.getElementById(`mutation-form-${i}`);
     if (!form) return;
 
-    const chainSelect = document.getElementById(`chain-select-${i}`);
-    const resNumInput = document.getElementById(`res-num-${i}`);
-    const origInput   = document.getElementById(`orig-aa-${i}`);
-    const mutInput    = document.getElementById(`mut-aa-${i}`);
+    const pdbId       = form.dataset.pdb;
+    const chainSelect = form.querySelector(`#chain-select-${i}`);
+    const resNumInput = form.querySelector(`#res-num-${i}`);
+    const origInput   = form.querySelector(`#orig-aa-${i}`);
+    const mutInput    = form.querySelector(`#mut-aa-${i}`);
     const resultDiv   = document.getElementById(`mutation-result-${i}`);
     const AA_RE       = /^[A-Za-z]$/;
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
-
       const chain  = chainSelect.value;
       const resNum = resNumInput.value.trim();
       const origAA = origInput.value.trim().toUpperCase();
@@ -46,10 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const pdbId    = i===1 ? window.PDB_ID_1 : window.PDB_ID_2;
       const mutation = `${chain}${resNum}${mutAA}`;
       const url      = `/api/mutation_metrics/${pdbId}/${mutation}`;
-
       resultDiv.textContent = "Analyzing mutation…";
 
       try {
@@ -65,9 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
           </p>
         `;
 
-        // highlight using component
-        const comp  = i===1 ? window.comp1 : window.comp2;
-        const stage = i===1 ? window.stage1 : window.stage2;
+        const comp  = i === 1 ? window.comp1 : window.comp2;
+        const stage = i === 1 ? window.stage1 : window.stage2;
         if (comp) {
           comp.addRepresentation("ball+stick", {
             sele: `${resNum} and :${chain}`,
@@ -76,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           stage.autoView();
         }
-      } catch(err) {
+      } catch (err) {
         resultDiv.textContent = "Error: " + err.message;
         console.error(err);
       }
@@ -86,11 +85,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3) Back-to-top
   const backBtn = document.getElementById("backToTop");
   if (backBtn) {
-    window.addEventListener("scroll", ()=> {
-      backBtn.style.display = window.scrollY>200 ? "block" : "none";
+    window.addEventListener("scroll", () => {
+      backBtn.style.display = window.scrollY > 200 ? "block" : "none";
     });
-    backBtn.addEventListener("click", ()=> {
-      window.scrollTo({top:0,behavior:"smooth"});
+    backBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
 });

@@ -199,7 +199,7 @@ def api_mutation_metrics(pdb_id, mutation):
         path = os.path.join(OUTPUT_DIR, pdb_id, parse)
         wt_struct  = parse_structure(path)
         mut_struct = model_mutation(path, mutation)
-        rmsd_val   = compute_mutation_rmsd(wt_struct, mut_struct)
+        rmsd_val   = compute_mutation_rmsd(wt_struct, mut_struct, mutation)
         com_diff   = compute_center_of_mass_difference(wt_struct, mut_struct)
         return {
             "pdb_id": pdb_id,
