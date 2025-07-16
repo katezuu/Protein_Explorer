@@ -1,4 +1,4 @@
-from explorer import get_phi_psi, fetch_uniprot_variants
+from explorer import get_phi_psi
 from mutation import model_mutation
 from metrics import compare_structures, compute_mutation_rmsd
 from plotting import plot_ca_scatter, plot_ramachandran

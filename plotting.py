@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib
+from mpl_toolkits.mplot3d import Axes3D
 
 matplotlib.use('Agg')
 
@@ -16,8 +17,8 @@ def plot_ca_scatter(structure, output_path: str) -> None:
             zs.append(z)
 
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(xs, ys, zs, s=10, c="teal", alpha=0.8)
+    ax: Axes3D = fig.add_subplot(111, projection="3d")
+    ax.scatter(xs, ys, zs=zs, s=10, c="teal", alpha=0.8)
     ax.set_title("C-alpha 3D Scatter")
     ax.set_xlabel("X")
     ax.set_ylabel("Y")

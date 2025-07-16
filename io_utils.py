@@ -4,7 +4,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from Bio.PDB import PDBParser, MMCIFParser
-
+from typing import Union
 from config import CACHE_DIR
 
 
@@ -77,6 +77,7 @@ def download_structure(pdb_id: str, out_dir: str):
 
 def parse_structure(path: str):
     ext = os.path.splitext(path)[1].lower()
+    parser: Union[PDBParser, MMCIFParser]
     if ext == ".pdb":
         parser = PDBParser(QUIET=True)
     elif ext in (".cif", ".mmcif"):
