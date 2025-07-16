@@ -79,6 +79,7 @@ __all__ = [
     "get_phi_psi",
 ]
 
+
 def fetch_uniprot_variants(accession: str) -> list:
     """Fetch variant data from UniProt REST API for a given accession."""
     url = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
