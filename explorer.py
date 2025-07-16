@@ -1,4 +1,6 @@
 """Utility wrappers for Protein Explorer."""
+from sphinx.util import requests
+
 from io_utils import (
     download_cif,
     download_pdb,
@@ -76,3 +78,20 @@ __all__ = [
     "get_ca_coordinates",
     "get_phi_psi",
 ]
+
+def fetch_uniprot_variants(accession: str) -> list:
+    """Fetch variant data from UniProt REST API for a given accession."""
+    url = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
+    resp = requests.get(url, timeout=10)
+    resp.raise_for_status()
+    data = resp.json()
+    variants = []
+    for feature in data.get("features", []):
+        if feature.get("type") == "VARIANT":
+            loc = feature.get("location", {})
+            variants.append({
+                "position": loc.get("start"),
+                "description": feature.get("description", ""),
+                "source": "UniProt"
+            })
+    return variants
