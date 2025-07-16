@@ -1,8 +1,10 @@
 """Utility wrappers for Protein Explorer."""
-from io_utils import (download_cif,
+from io_utils import (
+    download_cif,
     download_pdb,
     download_structure,
-    parse_structure)
+    parse_structure,
+)
 from metrics import (
     compute_center_of_mass,
     compare_structures,

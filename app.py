@@ -1,14 +1,15 @@
 import os
 import re
 import gzip
-from flask import (Flask,
-                   request,
-                   render_template,
-                   redirect,
-                   url_for,
-                   flash,
-                   send_from_directory
-                   )
+from flask import (
+    Flask,
+    request,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    send_from_directory,
+)
 
 import config
 from io_utils import download_cif, download_pdb, parse_structure
