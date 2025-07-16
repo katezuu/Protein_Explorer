@@ -1,10 +1,17 @@
 import os
 import re
 import gzip
-from flask import Flask, request, render_template, redirect, url_for, flash, send_from_directory
+from flask import (Flask,
+                   request,
+                   render_template,
+                   redirect,
+                   url_for,
+                   flash,
+                   send_from_directory
+                   )
 
 import config
-from io_utils import download_cif, download_pdb, download_structure, parse_structure
+from io_utils import download_cif, download_pdb, parse_structure
 from explorer import (
     count_residues,
     get_chain_sequences,
