@@ -42,6 +42,7 @@ def test_post_valid_but_nonexistent_pdb(monkeypatch, client):
 
     def fake_download(pdb_id, out_dir):
         raise FileNotFoundError('PDB not found')
+
     monkeypatch.setattr(io_utils, 'download_pdb', fake_download)
     resp = client.post(
         '/',

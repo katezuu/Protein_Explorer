@@ -14,7 +14,6 @@ sys.path.insert(
             os.path.dirname(__file__),
             '..')))
 
-
 PDB_CONTENT1 = """\
 ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N
 ATOM      2  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C
@@ -92,7 +91,8 @@ def test_fetch_uniprot_variants(monkeypatch):
 
     def fake_get(url, timeout=10):
         return FakeResp({'features': [{'type': 'VARIANT', 'location': {
-                        'start': 1}, 'description': 'mut'}]})
+            'start': 1}, 'description': 'mut'}]})
+
     monkeypatch.setattr('requests.get', fake_get)
     variants = fetch_uniprot_variants('P01234')
     assert variants and variants[0]['position'] == 1
