@@ -1,0 +1,418 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code API &mdash; Protein Explorer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=a7b56e54" />
+
+  
+    <link rel="shortcut icon" href="_static/logo.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Protein Explorer
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Code API</a><ul>
+<li><a class="reference internal" href="#explorer.compare_structures"><code class="docutils literal notranslate"><span class="pre">compare_structures()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.compute_center_of_mass"><code class="docutils literal notranslate"><span class="pre">compute_center_of_mass()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.compute_center_of_mass_difference"><code class="docutils literal notranslate"><span class="pre">compute_center_of_mass_difference()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.compute_mutation_rmsd"><code class="docutils literal notranslate"><span class="pre">compute_mutation_rmsd()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.count_residues"><code class="docutils literal notranslate"><span class="pre">count_residues()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.download_pdb"><code class="docutils literal notranslate"><span class="pre">download_pdb()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.fetch_clinvar_variants"><code class="docutils literal notranslate"><span class="pre">fetch_clinvar_variants()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.fetch_uniprot_variants"><code class="docutils literal notranslate"><span class="pre">fetch_uniprot_variants()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.get_ca_coordinates"><code class="docutils literal notranslate"><span class="pre">get_ca_coordinates()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.get_chain_sequences"><code class="docutils literal notranslate"><span class="pre">get_chain_sequences()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.get_phi_psi"><code class="docutils literal notranslate"><span class="pre">get_phi_psi()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.model_mutation"><code class="docutils literal notranslate"><span class="pre">model_mutation()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.parse_structure"><code class="docutils literal notranslate"><span class="pre">parse_structure()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.plot_ca_scatter"><code class="docutils literal notranslate"><span class="pre">plot_ca_scatter()</span></code></a></li>
+<li><a class="reference internal" href="#explorer.plot_ramachandran"><code class="docutils literal notranslate"><span class="pre">plot_ramachandran()</span></code></a></li>
+<li><a class="reference internal" href="#app.analyze_mutation"><code class="docutils literal notranslate"><span class="pre">analyze_mutation()</span></code></a></li>
+<li><a class="reference internal" href="#app.api_metrics"><code class="docutils literal notranslate"><span class="pre">api_metrics()</span></code></a></li>
+<li><a class="reference internal" href="#app.api_mutation_metrics"><code class="docutils literal notranslate"><span class="pre">api_mutation_metrics()</span></code></a></li>
+<li><a class="reference internal" href="#app.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li><a class="reference internal" href="#app.mutations_form"><code class="docutils literal notranslate"><span class="pre">mutations_form()</span></code></a></li>
+<li><a class="reference internal" href="#app.serve_file"><code class="docutils literal notranslate"><span class="pre">serve_file()</span></code></a></li>
+<li><a class="reference internal" href="#app.validate_pdb_id"><code class="docutils literal notranslate"><span class="pre">validate_pdb_id()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Protein Explorer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Code API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-explorer">
+<span id="code-api"></span><h1>Code API<a class="headerlink" href="#module-explorer" title="Link to this heading"></a></h1>
+<p>explorer.py</p>
+<p>Core functions for Protein Structure Explorer:
+- download_pdb: retrieves a PDB file from RCSB
+- parse_structure: parses PDB into Biopython Structure
+- count_residues: counts total residues and per‐chain
+- get_chain_sequences: extracts one‐letter amino acid sequences
+- compute_center_of_mass: computes average coordinates of Cα atoms
+- get_phi_psi: computes φ, ψ dihedral angles (degrees)
+- plot_ca_scatter: plots 3D Cα scatter to PNG using Matplotlib
+- plot_ramachandran: plots φ vs. ψ scatter
+- compare_structures: computes Cα RMSD between two structures</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.compare_structures">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">compare_structures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#compare_structures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.compare_structures" title="Link to this definition"></a></dt>
+<dd><p>Compare two structures by Cα RMSD (superimposed on first chain of each).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path1</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Path to the first PDB file.</p></li>
+<li><p><strong>path2</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Path to the second PDB file.</p></li>
+<li><p><strong>out_dir</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Directory in which to save the RMSD result text file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Root Mean Square Deviation (Å) after alignment.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rmsd (float)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Side Effect:</dt><dd><dl class="simple">
+<dt>Writes a file named “RMSD_&lt;ID1&gt;_&lt;ID2&gt;.txt” under out_dir with one line:</dt><dd><p>RMSD between &lt;ID1&gt; and &lt;ID2&gt;: &lt;value&gt; Å</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.compute_center_of_mass">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">compute_center_of_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#compute_center_of_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.compute_center_of_mass" title="Link to this definition"></a></dt>
+<dd><p>Compute approximate center of mass (average Cα coordinates).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure</strong> – a Bio.PDB.Structure.Structure object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A numpy array of shape (3,) representing the average x, y, z of all Cα atoms.
+Returns NaNs if no Cα atoms are found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.compute_center_of_mass_difference">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">compute_center_of_mass_difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wt_struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut_struct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#compute_center_of_mass_difference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.compute_center_of_mass_difference" title="Link to this definition"></a></dt>
+<dd><p>Return Euclidean distance between centers of mass of two structures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.compute_mutation_rmsd">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">compute_mutation_rmsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wt_struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut_struct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#compute_mutation_rmsd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.compute_mutation_rmsd" title="Link to this definition"></a></dt>
+<dd><p>Compute CA RMSD between wild type and mutant structures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.count_residues">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">count_residues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#count_residues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.count_residues" title="Link to this definition"></a></dt>
+<dd><p>Count total amino acid residues and per‐chain counts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure</strong> – a Bio.PDB.Structure.Structure object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>total number of amino acid residues (int).
+chain_counts: dict mapping chain ID to residue count.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>total</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.download_pdb">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">download_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#download_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.download_pdb" title="Link to this definition"></a></dt>
+<dd><p>Download a PDB file by its 4‐character ID from RCSB and save it locally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdb_id</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – 4-character PDB identifier (e.g., “1AKE”).</p></li>
+<li><p><strong>out_dir</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Directory in which to save the downloaded PDB.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path to the saved PDB file (e.g., “output_dir/1AKE.pdb”).</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – if PDB is not found on RCSB.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.fetch_clinvar_variants">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">fetch_clinvar_variants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#fetch_clinvar_variants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.fetch_clinvar_variants" title="Link to this definition"></a></dt>
+<dd><p>Fetch variant data from ClinVar for a given gene symbol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.fetch_uniprot_variants">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">fetch_uniprot_variants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accession</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#fetch_uniprot_variants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.fetch_uniprot_variants" title="Link to this definition"></a></dt>
+<dd><p>Fetch variant data from UniProt REST API for a given accession.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.get_ca_coordinates">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">get_ca_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#get_ca_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.get_ca_coordinates" title="Link to this definition"></a></dt>
+<dd><p>Return a list of [x, y, z] for all C-alpha atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.get_chain_sequences">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">get_chain_sequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#get_chain_sequences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.get_chain_sequences" title="Link to this definition"></a></dt>
+<dd><p>Extract one-letter amino acid sequences for each chain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure</strong> – a Bio.PDB.Structure.Structure object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict mapping chain ID to a sequence string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>seq_dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.get_phi_psi">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">get_phi_psi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#get_phi_psi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.get_phi_psi" title="Link to this definition"></a></dt>
+<dd><p>Calculate φ (phi) and ψ (psi) dihedral angles (in degrees) for each residue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure</strong> – a Bio.PDB.Structure.Structure object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of tuples [(phi_deg, psi_deg), …]. Resides without both angles are skipped.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>angles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.model_mutation">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">model_mutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#model_mutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.model_mutation" title="Link to this definition"></a></dt>
+<dd><p>Introduce a simple single point mutation and return the mutated structure.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.parse_structure">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">parse_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#parse_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.parse_structure" title="Link to this definition"></a></dt>
+<dd><p>Parse a PDB file into a Biopython Structure object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Path to the local PDB file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Bio.PDB.Structure.Structure object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.plot_ca_scatter">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">plot_ca_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#plot_ca_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.plot_ca_scatter" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Plot a 3D scatter of all Cα atoms and save as PNG.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> – a Bio.PDB.Structure.Structure object.</p></li>
+<li><p><strong>output_path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Path (including filename) to save the PNG.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="explorer.plot_ramachandran">
+<span class="sig-prename descclassname"><span class="pre">explorer.</span></span><span class="sig-name descname"><span class="pre">plot_ramachandran</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/explorer.html#plot_ramachandran"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#explorer.plot_ramachandran" title="Link to this definition"></a></dt>
+<dd><p>Plot a Ramachandran chart (phi vs. psi) and save as PNG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angles</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span>) – list of (phi_deg, psi_deg) tuples.</p></li>
+<li><p><strong>output_path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Path (including filename) to save the PNG.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-app">app.py</p>
+<p>Flask web application for Protein Structure Explorer:
+- Validates user input (4-character PDB IDs).
+- Downloads and parses PDB structures.
+- Calls explorer.py functions to compute and plot.
+- Renders results using Jinja2 templates (Bootstrap 5 styling).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.analyze_mutation">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">analyze_mutation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#analyze_mutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.analyze_mutation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api_metrics">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">api_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#api_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.api_metrics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api_mutation_metrics">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">api_mutation_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#api_mutation_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.api_mutation_metrics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.index">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.index" title="Link to this definition"></a></dt>
+<dd><p>GET: render form to input one or two PDB IDs.
+POST: validate input, download and analyze structures, return results.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.mutations_form">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">mutations_form</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#mutations_form"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.mutations_form" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.serve_file">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">serve_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#serve_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.serve_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.validate_pdb_id">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">validate_pdb_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#validate_pdb_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.validate_pdb_id" title="Link to this definition"></a></dt>
+<dd><p>Return True if pdb_id matches exactly 4 alphanumeric characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

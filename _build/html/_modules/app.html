@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app &mdash; Protein Explorer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a7b56e54" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Protein Explorer
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Protein Explorer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">app</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for app</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">app.py</span>
+
+<span class="sd">Flask web application for Protein Structure Explorer:</span>
+<span class="sd">- Validates user input (4-character PDB IDs).</span>
+<span class="sd">- Downloads and parses PDB structures.</span>
+<span class="sd">- Calls explorer.py functions to compute and plot.</span>
+<span class="sd">- Renders results using Jinja2 templates (Bootstrap 5 styling).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">url_for</span><span class="p">,</span> <span class="n">send_from_directory</span><span class="p">,</span> <span class="n">flash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">explorer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">download_pdb</span><span class="p">,</span>
+    <span class="n">parse_structure</span><span class="p">,</span>
+    <span class="n">count_residues</span><span class="p">,</span>
+    <span class="n">get_chain_sequences</span><span class="p">,</span>
+    <span class="n">compute_center_of_mass</span><span class="p">,</span>
+    <span class="n">get_ca_coordinates</span><span class="p">,</span>
+    <span class="n">get_phi_psi</span><span class="p">,</span>
+    <span class="n">plot_ca_scatter</span><span class="p">,</span>
+    <span class="n">plot_ramachandran</span><span class="p">,</span>
+    <span class="n">compare_structures</span><span class="p">,</span>
+    <span class="n">fetch_uniprot_variants</span><span class="p">,</span>
+    <span class="n">fetch_clinvar_variants</span><span class="p">,</span>
+    <span class="n">model_mutation</span><span class="p">,</span>
+    <span class="n">compute_mutation_rmsd</span><span class="p">,</span>
+    <span class="n">compute_center_of_mass_difference</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;SECRET_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;replace-this-with-a-secure-key&quot;</span><span class="p">)</span>
+
+<span class="c1"># Base directories</span>
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;outputs&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Regex to validate a 4-character PDB ID (letters and digits)</span>
+<span class="n">PDB_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[0-9A-Za-z]</span><span class="si">{4}</span><span class="s2">$&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="validate_pdb_id">
+<a class="viewcode-back" href="../modules.html#app.validate_pdb_id">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_pdb_id</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if pdb_id matches exactly 4 alphanumeric characters.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">PDB_PATTERN</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="index">
+<a class="viewcode-back" href="../modules.html#app.index">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GET: render form to input one or two PDB IDs.</span>
+<span class="sd">    POST: validate input, download and analyze structures, return results.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="c1"># Get IDs from form fields</span>
+        <span class="n">pdb1</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdb_id1&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">pdb2</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdb_id2&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="c1"># Validate first PDB ID</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pdb1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">validate_pdb_id</span><span class="p">(</span><span class="n">pdb1</span><span class="p">):</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s2">&quot;Please enter a valid 4-character PDB ID #1.&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Validate second PDB ID (optional)</span>
+        <span class="k">if</span> <span class="n">pdb2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_pdb_id</span><span class="p">(</span><span class="n">pdb2</span><span class="p">):</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s2">&quot;Please enter a valid 4-character PDB ID #2 or leave blank.&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Process first structure</span>
+        <span class="n">dir1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="n">pdb1</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dir1</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">path1</span> <span class="o">=</span> <span class="n">download_pdb</span><span class="p">(</span><span class="n">pdb1</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">dir1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download PDB </span><span class="si">{</span><span class="n">pdb1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">))</span>
+
+        <span class="n">struct1</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">path1</span><span class="p">)</span>
+        <span class="n">total1</span><span class="p">,</span> <span class="n">chains1</span> <span class="o">=</span> <span class="n">count_residues</span><span class="p">(</span><span class="n">struct1</span><span class="p">)</span>
+        <span class="n">seqs1</span> <span class="o">=</span> <span class="n">get_chain_sequences</span><span class="p">(</span><span class="n">struct1</span><span class="p">)</span>
+        <span class="n">center1</span> <span class="o">=</span> <span class="n">compute_center_of_mass</span><span class="p">(</span><span class="n">struct1</span><span class="p">)</span>
+        <span class="n">ca1_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb1</span><span class="si">}</span><span class="s2">_ca_scatter.png&quot;</span><span class="p">)</span>
+        <span class="n">plot_ca_scatter</span><span class="p">(</span><span class="n">struct1</span><span class="p">,</span> <span class="n">ca1_path</span><span class="p">)</span>
+        <span class="n">angles1</span> <span class="o">=</span> <span class="n">get_phi_psi</span><span class="p">(</span><span class="n">struct1</span><span class="p">)</span>
+        <span class="n">rama1_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb1</span><span class="si">}</span><span class="s2">_ramachandran.png&quot;</span><span class="p">)</span>
+        <span class="n">plot_ramachandran</span><span class="p">(</span><span class="n">angles1</span><span class="p">,</span> <span class="n">rama1_path</span><span class="p">)</span>
+        <span class="n">ca_coords1</span> <span class="o">=</span> <span class="n">get_ca_coordinates</span><span class="p">(</span><span class="n">struct1</span><span class="p">)</span>
+
+        <span class="n">result_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;pdb1&quot;</span><span class="p">:</span> <span class="n">pdb1</span><span class="p">,</span>
+            <span class="s2">&quot;total1&quot;</span><span class="p">:</span> <span class="n">total1</span><span class="p">,</span>
+            <span class="s2">&quot;chains1&quot;</span><span class="p">:</span> <span class="n">chains1</span><span class="p">,</span>
+            <span class="s2">&quot;seqs1&quot;</span><span class="p">:</span> <span class="n">seqs1</span><span class="p">,</span>
+            <span class="s2">&quot;center1&quot;</span><span class="p">:</span> <span class="n">center1</span><span class="p">,</span>
+            <span class="s2">&quot;ca1_url&quot;</span><span class="p">:</span> <span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;serve_file&quot;</span><span class="p">,</span> <span class="n">pdb_id</span><span class="o">=</span><span class="n">pdb1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb1</span><span class="si">}</span><span class="s2">_ca_scatter.png&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;rama1_url&quot;</span><span class="p">:</span> <span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;serve_file&quot;</span><span class="p">,</span> <span class="n">pdb_id</span><span class="o">=</span><span class="n">pdb1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb1</span><span class="si">}</span><span class="s2">_ramachandran.png&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;pdb1_file_url&quot;</span><span class="p">:</span> <span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;serve_file&quot;</span><span class="p">,</span> <span class="n">pdb_id</span><span class="o">=</span><span class="n">pdb1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb1</span><span class="si">}</span><span class="s2">.pdb&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;angles1&quot;</span><span class="p">:</span> <span class="n">angles1</span><span class="p">,</span>
+            <span class="s2">&quot;ca_coords1&quot;</span><span class="p">:</span> <span class="n">ca_coords1</span><span class="p">,</span>
+            <span class="s2">&quot;rmsd&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;pdb2&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Process second structure if provided</span>
+        <span class="k">if</span> <span class="n">pdb2</span><span class="p">:</span>
+            <span class="n">dir2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="n">pdb2</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dir2</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">path2</span> <span class="o">=</span> <span class="n">download_pdb</span><span class="p">(</span><span class="n">pdb2</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">dir2</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">flash</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download PDB </span><span class="si">{</span><span class="n">pdb2</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">))</span>
+
+            <span class="n">struct2</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">path2</span><span class="p">)</span>
+            <span class="n">total2</span><span class="p">,</span> <span class="n">chains2</span> <span class="o">=</span> <span class="n">count_residues</span><span class="p">(</span><span class="n">struct2</span><span class="p">)</span>
+            <span class="n">seqs2</span> <span class="o">=</span> <span class="n">get_chain_sequences</span><span class="p">(</span><span class="n">struct2</span><span class="p">)</span>
+            <span class="n">center2</span> <span class="o">=</span> <span class="n">compute_center_of_mass</span><span class="p">(</span><span class="n">struct2</span><span class="p">)</span>
+            <span class="n">ca2_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb2</span><span class="si">}</span><span class="s2">_ca_scatter.png&quot;</span><span class="p">)</span>
+            <span class="n">plot_ca_scatter</span><span class="p">(</span><span class="n">struct2</span><span class="p">,</span> <span class="n">ca2_path</span><span class="p">)</span>
+            <span class="n">angles2</span> <span class="o">=</span> <span class="n">get_phi_psi</span><span class="p">(</span><span class="n">struct2</span><span class="p">)</span>
+            <span class="n">rama2_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb2</span><span class="si">}</span><span class="s2">_ramachandran.png&quot;</span><span class="p">)</span>
+            <span class="n">plot_ramachandran</span><span class="p">(</span><span class="n">angles2</span><span class="p">,</span> <span class="n">rama2_path</span><span class="p">)</span>
+            <span class="n">ca_coords2</span> <span class="o">=</span> <span class="n">get_ca_coordinates</span><span class="p">(</span><span class="n">struct2</span><span class="p">)</span>
+
+            <span class="n">rmsd_value</span> <span class="o">=</span> <span class="n">compare_structures</span><span class="p">(</span><span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">OUTPUT_DIR</span><span class="p">)</span>
+            <span class="n">result_data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s2">&quot;pdb2&quot;</span><span class="p">:</span> <span class="n">pdb2</span><span class="p">,</span>
+                <span class="s2">&quot;total2&quot;</span><span class="p">:</span> <span class="n">total2</span><span class="p">,</span>
+                <span class="s2">&quot;chains2&quot;</span><span class="p">:</span> <span class="n">chains2</span><span class="p">,</span>
+                <span class="s2">&quot;seqs2&quot;</span><span class="p">:</span> <span class="n">seqs2</span><span class="p">,</span>
+                <span class="s2">&quot;center2&quot;</span><span class="p">:</span> <span class="n">center2</span><span class="p">,</span>
+                <span class="s2">&quot;ca2_url&quot;</span><span class="p">:</span> <span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;serve_file&quot;</span><span class="p">,</span> <span class="n">pdb_id</span><span class="o">=</span><span class="n">pdb2</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb2</span><span class="si">}</span><span class="s2">_ca_scatter.png&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;rama2_url&quot;</span><span class="p">:</span> <span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;serve_file&quot;</span><span class="p">,</span> <span class="n">pdb_id</span><span class="o">=</span><span class="n">pdb2</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb2</span><span class="si">}</span><span class="s2">_ramachandran.png&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;pdb2_file_url&quot;</span><span class="p">:</span> <span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;serve_file&quot;</span><span class="p">,</span> <span class="n">pdb_id</span><span class="o">=</span><span class="n">pdb2</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb2</span><span class="si">}</span><span class="s2">.pdb&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;angles2&quot;</span><span class="p">:</span> <span class="n">angles2</span><span class="p">,</span>
+                <span class="s2">&quot;ca_coords2&quot;</span><span class="p">:</span> <span class="n">ca_coords2</span><span class="p">,</span>
+                <span class="s2">&quot;rmsd&quot;</span><span class="p">:</span> <span class="n">rmsd_value</span><span class="p">,</span>
+            <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;result.html&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">result_data</span><span class="p">)</span>
+
+    <span class="c1"># GET request: render form</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mutations_form">
+<a class="viewcode-back" href="../modules.html#app.mutations_form">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/mutations&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mutations_form</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;mutations.html&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="analyze_mutation">
+<a class="viewcode-back" href="../modules.html#app.analyze_mutation">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/analyze_mutation&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_mutation</span><span class="p">():</span>
+    <span class="n">pdb_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdb_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">mutation</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mutation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pdb_id</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">validate_pdb_id</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">):</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s2">&quot;Please enter a valid 4-character PDB ID.&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;mutations_form&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mutation</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s2">&quot;Please provide a mutation (e.g., A123C).&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;mutations_form&quot;</span><span class="p">))</span>
+
+    <span class="n">dir1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb_id</span><span class="si">}</span><span class="s2">_mut&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dir1</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pdb_path</span> <span class="o">=</span> <span class="n">download_pdb</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">dir1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download PDB </span><span class="si">{</span><span class="n">pdb_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;mutations_form&quot;</span><span class="p">))</span>
+
+    <span class="n">wt_struct</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span>
+    <span class="n">mut_struct</span> <span class="o">=</span> <span class="n">model_mutation</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">,</span> <span class="n">mutation</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">Bio.PDB</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBIO</span>
+    <span class="n">io</span> <span class="o">=</span> <span class="n">PDBIO</span><span class="p">()</span>
+    <span class="n">io</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="n">mut_struct</span><span class="p">)</span>
+    <span class="n">io</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb_id</span><span class="si">}</span><span class="s2">_mut.pdb&quot;</span><span class="p">))</span>
+
+    <span class="n">rmsd_val</span> <span class="o">=</span> <span class="n">compute_mutation_rmsd</span><span class="p">(</span><span class="n">wt_struct</span><span class="p">,</span> <span class="n">mut_struct</span><span class="p">)</span>
+    <span class="n">com_diff</span> <span class="o">=</span> <span class="n">compute_center_of_mass_difference</span><span class="p">(</span><span class="n">wt_struct</span><span class="p">,</span> <span class="n">mut_struct</span><span class="p">)</span>
+
+    <span class="n">uniprot_variants</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">clinvar_variants</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uniprot_variants</span> <span class="o">=</span> <span class="n">fetch_uniprot_variants</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">clinvar_variants</span> <span class="o">=</span> <span class="n">fetch_clinvar_variants</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+        <span class="s2">&quot;mutation_result.html&quot;</span><span class="p">,</span>
+        <span class="n">pdb_id</span><span class="o">=</span><span class="n">pdb_id</span><span class="p">,</span>
+        <span class="n">mutation</span><span class="o">=</span><span class="n">mutation</span><span class="p">,</span>
+        <span class="n">rmsd</span><span class="o">=</span><span class="n">rmsd_val</span><span class="p">,</span>
+        <span class="n">com_diff</span><span class="o">=</span><span class="n">com_diff</span><span class="p">,</span>
+        <span class="n">uniprot_variants</span><span class="o">=</span><span class="n">uniprot_variants</span><span class="p">,</span>
+        <span class="n">clinvar_variants</span><span class="o">=</span><span class="n">clinvar_variants</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="serve_file">
+<a class="viewcode-back" href="../modules.html#app.serve_file">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/outputs/&lt;pdb_id&gt;/&lt;filename&gt;&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_file</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">),</span> <span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="api_metrics">
+<a class="viewcode-back" href="../modules.html#app.api_metrics">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/api/metrics/&lt;pdb_id&gt;&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">api_metrics</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_pdb_id</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid pdb id&quot;</span><span class="p">},</span> <span class="mi">400</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pdb_path</span> <span class="o">=</span> <span class="n">download_pdb</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">OUTPUT_DIR</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)},</span> <span class="mi">500</span>
+    <span class="n">struct</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span>
+    <span class="n">total</span><span class="p">,</span> <span class="n">chains</span> <span class="o">=</span> <span class="n">count_residues</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">compute_center_of_mass</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;pdb_id&quot;</span><span class="p">:</span> <span class="n">pdb_id</span><span class="p">,</span> <span class="s2">&quot;total_residues&quot;</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span> <span class="s2">&quot;chains&quot;</span><span class="p">:</span> <span class="n">chains</span><span class="p">,</span> <span class="s2">&quot;center_of_mass&quot;</span><span class="p">:</span> <span class="n">center</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="api_mutation_metrics">
+<a class="viewcode-back" href="../modules.html#app.api_mutation_metrics">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/api/mutation_metrics/&lt;pdb_id&gt;/&lt;mutation&gt;&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">api_mutation_metrics</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">mutation</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_pdb_id</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid pdb id&quot;</span><span class="p">},</span> <span class="mi">400</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pdb_path</span> <span class="o">=</span> <span class="n">download_pdb</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">OUTPUT_DIR</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)},</span> <span class="mi">500</span>
+    <span class="n">wt_struct</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span>
+    <span class="n">mut_struct</span> <span class="o">=</span> <span class="n">model_mutation</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">,</span> <span class="n">mutation</span><span class="p">)</span>
+    <span class="n">rmsd_val</span> <span class="o">=</span> <span class="n">compute_mutation_rmsd</span><span class="p">(</span><span class="n">wt_struct</span><span class="p">,</span> <span class="n">mut_struct</span><span class="p">)</span>
+    <span class="n">com_diff</span> <span class="o">=</span> <span class="n">compute_center_of_mass_difference</span><span class="p">(</span><span class="n">wt_struct</span><span class="p">,</span> <span class="n">mut_struct</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;pdb_id&quot;</span><span class="p">:</span> <span class="n">pdb_id</span><span class="p">,</span>
+        <span class="s2">&quot;mutation&quot;</span><span class="p">:</span> <span class="n">mutation</span><span class="p">,</span>
+        <span class="s2">&quot;rmsd&quot;</span><span class="p">:</span> <span class="n">rmsd_val</span><span class="p">,</span>
+        <span class="s2">&quot;center_of_mass_diff&quot;</span><span class="p">:</span> <span class="n">com_diff</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

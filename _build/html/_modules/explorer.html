@@ -1,0 +1,525 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>explorer &mdash; Protein Explorer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a7b56e54" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Protein Explorer
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Protein Explorer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">explorer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for explorer</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">explorer.py</span>
+
+<span class="sd">Core functions for Protein Structure Explorer:</span>
+<span class="sd">- download_pdb: retrieves a PDB file from RCSB</span>
+<span class="sd">- parse_structure: parses PDB into Biopython Structure</span>
+<span class="sd">- count_residues: counts total residues and per‐chain</span>
+<span class="sd">- get_chain_sequences: extracts one‐letter amino acid sequences</span>
+<span class="sd">- compute_center_of_mass: computes average coordinates of Cα atoms</span>
+<span class="sd">- get_phi_psi: computes φ, ψ dihedral angles (degrees)</span>
+<span class="sd">- plot_ca_scatter: plots 3D Cα scatter to PNG using Matplotlib</span>
+<span class="sd">- plot_ramachandran: plots φ vs. ψ scatter</span>
+<span class="sd">- compare_structures: computes Cα RMSD between two structures</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="c1"># Use Agg backend so that Matplotlib does not require a display</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.PDB</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBList</span><span class="p">,</span> <span class="n">PDBParser</span><span class="p">,</span> <span class="n">PPBuilder</span><span class="p">,</span> <span class="n">is_aa</span><span class="p">,</span> <span class="n">Superimposer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">degrees</span>
+
+
+<div class="viewcode-block" id="download_pdb">
+<a class="viewcode-back" href="../modules.html#explorer.download_pdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_pdb</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download a PDB file by its 4‐character ID from RCSB and save it locally.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pdb_id: 4-character PDB identifier (e.g., &quot;1AKE&quot;).</span>
+<span class="sd">        out_dir: Directory in which to save the downloaded PDB.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Path to the saved PDB file (e.g., &quot;output_dir/1AKE.pdb&quot;).</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: if PDB is not found on RCSB.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pdbl</span> <span class="o">=</span> <span class="n">PDBList</span><span class="p">()</span>
+    <span class="c1"># retrieve_pdb_file writes something like &quot;pdb1ake.ent&quot; by default</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">pdbl</span><span class="o">.</span><span class="n">retrieve_pdb_file</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">pdir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s2">&quot;pdb&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filepath</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PDB </span><span class="si">{</span><span class="n">pdb_id</span><span class="si">}</span><span class="s2"> not found on RCSB.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Rename the file to &quot;&lt;pdb_id&gt;.pdb&quot;</span>
+    <span class="n">base_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">new_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdb_id</span><span class="si">}</span><span class="s2">.pdb&quot;</span>
+    <span class="n">new_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+
+    <span class="c1"># Remove if a file with that name already exists</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">new_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">new_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_path</span></div>
+
+
+
+<div class="viewcode-block" id="parse_structure">
+<a class="viewcode-back" href="../modules.html#explorer.parse_structure">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_structure</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse a PDB file into a Biopython Structure object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path: Path to the local PDB file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A Bio.PDB.Structure.Structure object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">PDBParser</span><span class="p">(</span><span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">structure_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">structure_id</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">structure</span></div>
+
+
+
+<div class="viewcode-block" id="count_residues">
+<a class="viewcode-back" href="../modules.html#explorer.count_residues">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">count_residues</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Count total amino acid residues and per‐chain counts.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        structure: a Bio.PDB.Structure.Structure object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        total: total number of amino acid residues (int).</span>
+<span class="sd">        chain_counts: dict mapping chain ID to residue count.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chain_counts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">structure</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">is_aa</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">chain_counts</span><span class="p">[</span><span class="n">chain</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">count</span>
+    <span class="k">return</span> <span class="n">total</span><span class="p">,</span> <span class="n">chain_counts</span></div>
+
+
+
+<div class="viewcode-block" id="get_chain_sequences">
+<a class="viewcode-back" href="../modules.html#explorer.get_chain_sequences">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_chain_sequences</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract one-letter amino acid sequences for each chain.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        structure: a Bio.PDB.Structure.Structure object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        seq_dict: dict mapping chain ID to a sequence string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ppb</span> <span class="o">=</span> <span class="n">PPBuilder</span><span class="p">()</span>
+    <span class="n">seq_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">structure</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+            <span class="n">peptides</span> <span class="o">=</span> <span class="n">ppb</span><span class="o">.</span><span class="n">build_peptides</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">peptide</span><span class="o">.</span><span class="n">get_sequence</span><span class="p">())</span> <span class="k">for</span> <span class="n">peptide</span> <span class="ow">in</span> <span class="n">peptides</span><span class="p">)</span>
+            <span class="n">seq_dict</span><span class="p">[</span><span class="n">chain</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">seq</span>
+    <span class="k">return</span> <span class="n">seq_dict</span></div>
+
+
+
+<div class="viewcode-block" id="compute_center_of_mass">
+<a class="viewcode-back" href="../modules.html#explorer.compute_center_of_mass">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_center_of_mass</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute approximate center of mass (average Cα coordinates).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        structure: a Bio.PDB.Structure.Structure object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A numpy array of shape (3,) representing the average x, y, z of all Cα atoms.</span>
+<span class="sd">        Returns NaNs if no Cα atoms are found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">structure</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;CA&quot;</span><span class="p">:</span>
+            <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_coord</span><span class="p">())</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">coords</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_ca_coordinates">
+<a class="viewcode-back" href="../modules.html#explorer.get_ca_coordinates">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_ca_coordinates</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of [x, y, z] for all C-alpha atoms.&quot;&quot;&quot;</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">structure</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;CA&quot;</span><span class="p">:</span>
+            <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_coord</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">coords</span></div>
+
+
+
+<div class="viewcode-block" id="get_phi_psi">
+<a class="viewcode-back" href="../modules.html#explorer.get_phi_psi">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_phi_psi</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate φ (phi) and ψ (psi) dihedral angles (in degrees) for each residue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        structure: a Bio.PDB.Structure.Structure object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        angles: a list of tuples [(phi_deg, psi_deg), ...]. Resides without both angles are skipped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ppb</span> <span class="o">=</span> <span class="n">PPBuilder</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">structure</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pp</span> <span class="ow">in</span> <span class="n">ppb</span><span class="o">.</span><span class="n">build_peptides</span><span class="p">(</span><span class="n">chain</span><span class="p">):</span>
+                <span class="n">phi_psi</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">get_phi_psi_list</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span> <span class="ow">in</span> <span class="n">phi_psi</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">phi</span> <span class="ow">and</span> <span class="n">psi</span><span class="p">:</span>
+                        <span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">degrees</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="n">degrees</span><span class="p">(</span><span class="n">psi</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">angles</span></div>
+
+
+
+<div class="viewcode-block" id="plot_ca_scatter">
+<a class="viewcode-back" href="../modules.html#explorer.plot_ca_scatter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_ca_scatter</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot a 3D scatter of all Cα atoms and save as PNG.</span>
+
+<span class="sd">Args:</span>
+<span class="sd">    structure: a Bio.PDB.Structure.Structure object.</span>
+<span class="sd">    output_path: Path (including filename) to save the PNG.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># noqa: F401</span>
+
+    <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">structure</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;CA&quot;</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_coord</span><span class="p">()</span>
+            <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;teal&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;C-alpha 3D Scatter&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="plot_ramachandran">
+<a class="viewcode-back" href="../modules.html#explorer.plot_ramachandran">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_ramachandran</span><span class="p">(</span><span class="n">angles</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot a Ramachandran chart (phi vs. psi) and save as PNG.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        angles: list of (phi_deg, psi_deg) tuples.</span>
+<span class="sd">        output_path: Path (including filename) to save the PNG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">phis</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">]</span>
+    <span class="n">psis</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">]</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">phis</span><span class="p">,</span> <span class="n">psis</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;darkorange&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Ramachandran Plot&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Phi (°)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Psi (°)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="compare_structures">
+<a class="viewcode-back" href="../modules.html#explorer.compare_structures">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_structures</span><span class="p">(</span><span class="n">path1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compare two structures by Cα RMSD (superimposed on first chain of each).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path1: Path to the first PDB file.</span>
+<span class="sd">        path2: Path to the second PDB file.</span>
+<span class="sd">        out_dir: Directory in which to save the RMSD result text file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        rmsd (float): Root Mean Square Deviation (Å) after alignment.</span>
+
+<span class="sd">    Side Effect:</span>
+<span class="sd">        Writes a file named &quot;RMSD_&lt;ID1&gt;_&lt;ID2&gt;.txt&quot; under out_dir with one line:</span>
+<span class="sd">           RMSD between &lt;ID1&gt; and &lt;ID2&gt;: &lt;value&gt; Å</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">struct1</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">path1</span><span class="p">)</span>
+    <span class="n">struct2</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">path2</span><span class="p">)</span>
+
+    <span class="c1"># Use only the first model and the first chain in each structure</span>
+    <span class="n">model1</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">struct1</span><span class="o">.</span><span class="n">get_models</span><span class="p">())</span>
+    <span class="n">model2</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">struct2</span><span class="o">.</span><span class="n">get_models</span><span class="p">())</span>
+    <span class="n">chain1_id</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">model1</span><span class="o">.</span><span class="n">get_chains</span><span class="p">())</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">chain2_id</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">get_chains</span><span class="p">())</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;CA&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">model1</span><span class="p">[</span><span class="n">chain1_id</span><span class="p">]</span> <span class="k">if</span> <span class="n">is_aa</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;CA&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
+    <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;CA&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">model2</span><span class="p">[</span><span class="n">chain2_id</span><span class="p">]</span> <span class="k">if</span> <span class="n">is_aa</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;CA&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
+
+    <span class="c1"># Trim to the shorter length</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca2</span><span class="p">))</span>
+    <span class="n">ca1</span> <span class="o">=</span> <span class="n">ca1</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+    <span class="n">ca2</span> <span class="o">=</span> <span class="n">ca2</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+
+    <span class="c1"># Superimpose</span>
+    <span class="n">sup</span> <span class="o">=</span> <span class="n">Superimposer</span><span class="p">()</span>
+    <span class="n">sup</span><span class="o">.</span><span class="n">set_atoms</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span> <span class="n">ca2</span><span class="p">)</span>
+    <span class="n">sup</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">())</span>  <span class="c1"># transform the second structure</span>
+
+    <span class="n">rmsd_value</span> <span class="o">=</span> <span class="n">sup</span><span class="o">.</span><span class="n">rms</span>
+
+    <span class="c1"># Write RMSD to a text file</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">id2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path2</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">txt_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;RMSD_</span><span class="si">{</span><span class="n">id1</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">id2</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+    <span class="n">txt_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">txt_filename</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">txt_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RMSD between </span><span class="si">{</span><span class="n">id1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">id2</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">rmsd_value</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Å</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rmsd_value</span></div>
+
+
+
+<span class="c1"># --- Mutation Analysis Functions ---</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.PDB.Polypeptide</span><span class="w"> </span><span class="kn">import</span> <span class="n">three_to_index</span><span class="p">,</span> <span class="n">index_to_three</span>
+
+
+<div class="viewcode-block" id="fetch_uniprot_variants">
+<a class="viewcode-back" href="../modules.html#explorer.fetch_uniprot_variants">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_uniprot_variants</span><span class="p">(</span><span class="n">accession</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch variant data from UniProt REST API for a given accession.&quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://rest.uniprot.org/uniprotkb/</span><span class="si">{</span><span class="n">accession</span><span class="si">}</span><span class="s2">.json&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch UniProt data: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="n">variants</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;features&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">feature</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;VARIANT&quot;</span><span class="p">:</span>
+            <span class="n">loc</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">)</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">variant_type</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ftType&quot;</span><span class="p">,</span> <span class="s2">&quot;variant&quot;</span><span class="p">)</span>
+            <span class="n">variants</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="n">pos</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">variant_type</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">desc</span><span class="p">,</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;UniProt&quot;</span><span class="p">,</span>
+            <span class="p">})</span>
+    <span class="k">return</span> <span class="n">variants</span></div>
+
+
+
+<div class="viewcode-block" id="fetch_clinvar_variants">
+<a class="viewcode-back" href="../modules.html#explorer.fetch_clinvar_variants">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_clinvar_variants</span><span class="p">(</span><span class="n">gene</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch variant data from ClinVar for a given gene symbol.&quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;?db=clinvar&amp;retmode=json&amp;term=</span><span class="si">{</span><span class="n">gene</span><span class="si">}</span><span class="s2">[gene]&quot;</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch ClinVar data: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;esearchresult&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;idlist&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">variants</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>  <span class="c1"># limit to first few ids for brevity</span>
+        <span class="n">summary_url</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;?db=clinvar&amp;id=</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s2">&amp;retmode=json&quot;</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sresp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">summary_url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">sresp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">sresp</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;result&quot;</span><span class="p">][</span><span class="n">cid</span><span class="p">]</span>
+            <span class="n">hgvs</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">clinsig</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;clinical_significance&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">variants</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;hgvs&quot;</span><span class="p">:</span> <span class="n">hgvs</span><span class="p">,</span>
+                <span class="s2">&quot;clinical_significance&quot;</span><span class="p">:</span> <span class="n">clinsig</span><span class="p">,</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar&quot;</span><span class="p">,</span>
+            <span class="p">})</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">return</span> <span class="n">variants</span></div>
+
+
+
+<div class="viewcode-block" id="model_mutation">
+<a class="viewcode-back" href="../modules.html#explorer.model_mutation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_mutation</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mutation</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Introduce a simple single point mutation and return the mutated structure.&quot;&quot;&quot;</span>
+    <span class="n">struct</span> <span class="o">=</span> <span class="n">parse_structure</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="n">mutation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="n">mutation</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mutation</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">get_residues</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">pos</span><span class="p">:</span>
+            <span class="n">residue</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="n">index_to_three</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">struct</span></div>
+
+
+
+<div class="viewcode-block" id="compute_mutation_rmsd">
+<a class="viewcode-back" href="../modules.html#explorer.compute_mutation_rmsd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_mutation_rmsd</span><span class="p">(</span><span class="n">wt_struct</span><span class="p">,</span> <span class="n">mut_struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute CA RMSD between wild type and mutant structures.&quot;&quot;&quot;</span>
+    <span class="n">model1</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">wt_struct</span><span class="o">.</span><span class="n">get_models</span><span class="p">())</span>
+    <span class="n">model2</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">mut_struct</span><span class="o">.</span><span class="n">get_models</span><span class="p">())</span>
+    <span class="n">chain1_id</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">model1</span><span class="o">.</span><span class="n">get_chains</span><span class="p">())</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">chain2_id</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">get_chains</span><span class="p">())</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">ca1</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;CA&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">model1</span><span class="p">[</span><span class="n">chain1_id</span><span class="p">]</span> <span class="k">if</span> <span class="n">is_aa</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;CA&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
+    <span class="n">ca2</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;CA&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">model2</span><span class="p">[</span><span class="n">chain2_id</span><span class="p">]</span> <span class="k">if</span> <span class="n">is_aa</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;CA&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca2</span><span class="p">))</span>
+    <span class="n">ca1</span> <span class="o">=</span> <span class="n">ca1</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+    <span class="n">ca2</span> <span class="o">=</span> <span class="n">ca2</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+    <span class="n">sup</span> <span class="o">=</span> <span class="n">Superimposer</span><span class="p">()</span>
+    <span class="n">sup</span><span class="o">.</span><span class="n">set_atoms</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span> <span class="n">ca2</span><span class="p">)</span>
+    <span class="n">sup</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">sup</span><span class="o">.</span><span class="n">rms</span></div>
+
+
+
+<div class="viewcode-block" id="compute_center_of_mass_difference">
+<a class="viewcode-back" href="../modules.html#explorer.compute_center_of_mass_difference">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_center_of_mass_difference</span><span class="p">(</span><span class="n">wt_struct</span><span class="p">,</span> <span class="n">mut_struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return Euclidean distance between centers of mass of two structures.&quot;&quot;&quot;</span>
+    <span class="n">com1</span> <span class="o">=</span> <span class="n">compute_center_of_mass</span><span class="p">(</span><span class="n">wt_struct</span><span class="p">)</span>
+    <span class="n">com2</span> <span class="o">=</span> <span class="n">compute_center_of_mass</span><span class="p">(</span><span class="n">mut_struct</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">com1</span> <span class="o">-</span> <span class="n">com2</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
