@@ -78,12 +78,21 @@ def create_app() -> Flask:
             pdb2 = request.form.get("pdb_id2", "").strip().upper()
 
             if not pdb1 or not validate_pdb_id(pdb1):
-                flash("Please enter a valid 4-character PDB ID #1.", "error")
+                flash(
+                    (
+                        "Please enter a valid 4-character PDB ID #1 "
+                        "or leave blank."
+                    ),
+                    "error",
+                )
                 return redirect(url_for("index"))
             if pdb2 and not validate_pdb_id(pdb2):
                 flash(
-                "Please enter a valid 4-character PDB ID #2 or leave blank.",
-                "error",
+                    (
+                        "Please enter a valid 4-character PDB ID #2 "
+                        "or leave blank."
+                    ),
+                    "error",
                 )
                 return redirect(url_for("index"))
 
