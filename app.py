@@ -83,7 +83,8 @@ def create_app() -> Flask:
             if pdb2 and not validate_pdb_id(pdb2):
                 flash(
                 "Please enter a valid 4-character PDB ID #2 or leave blank.",
-                "error")
+                "error",
+                )
                 return redirect(url_for("index"))
 
             dir1 = os.path.join(output_dir, pdb1)
