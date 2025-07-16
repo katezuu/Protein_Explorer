@@ -1,6 +1,6 @@
-from app import create_app
 import os
 import sys
+from app import create_app
 import pytest
 
 sys.path.insert(
