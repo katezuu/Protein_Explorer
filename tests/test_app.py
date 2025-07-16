@@ -9,6 +9,7 @@ sys.path.insert(
 )
 
 from app import create_app
+import io_utils
 
 
 @pytest.fixture
@@ -39,8 +40,6 @@ def test_post_invalid_pdb(client):
 
 
 def test_post_valid_but_nonexistent_pdb(monkeypatch, client):
-    import io_utils
-
     def fake_download(pdb_id, out_dir):
         raise FileNotFoundError("PDB not found")
 
