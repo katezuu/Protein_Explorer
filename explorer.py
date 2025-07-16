@@ -1,7 +1,8 @@
 """Utility wrappers for Protein Explorer."""
-from typing import Any
-
-from io_utils import download_cif, download_pdb, download_structure, parse_structure
+from io_utils import (download_cif,
+    download_pdb,
+    download_structure,
+    parse_structure)
 from metrics import (
     compute_center_of_mass,
     compare_structures,

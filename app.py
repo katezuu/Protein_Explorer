@@ -50,7 +50,8 @@ def create_app() -> Flask:
             gz_path = cif_path + ".gz"
             gz_name = cif_name + ".gz"
             if not os.path.exists(gz_path):
-                with open(cif_path, "rb") as f_in, gzip.open(gz_path, "wb") as f_out:
+                with (open(cif_path, "rb") as f_in,
+                      gzip.open(gz_path, "wb") as f_out):
                     f_out.writelines(f_in)
             return gz_name, "mmcif_gz", cif_name
         except Exception:
@@ -80,8 +81,8 @@ def create_app() -> Flask:
                 return redirect(url_for("index"))
             if pdb2 and not validate_pdb_id(pdb2):
                 flash(
-                    "Please enter a valid 4-character PDB ID #2 or leave blank.",
-                    "error")
+                "Please enter a valid 4-character PDB ID #2 or leave blank.",
+                "error")
                 return redirect(url_for("index"))
 
             dir1 = os.path.join(output_dir, pdb1)
@@ -150,13 +151,17 @@ def create_app() -> Flask:
                     "pdb2": pdb2,
                     "serve2": serve2,
                     "fmt2": fmt2,
-                    "url2": url_for("serve_file", pdb_id=pdb2, filename=serve2),
+                    "url2": url_for("serve_file",
+                                    pdb_id=pdb2, filename=serve2),
                     "total2": total2,
                     "chains2": chains2,
                     "seqs2": seqs2,
                     "center2": center2,
-                    "ca2_url": url_for("serve_file", pdb_id=pdb2, filename=f"{pdb2}_ca_scatter.png"),
-                    "rama2_url": url_for("serve_file", pdb_id=pdb2, filename=f"{pdb2}_ramachandran.png"),
+                    "ca2_url": url_for("serve_file", pdb_id=pdb2,
+                                       filename=f"{pdb2}_ca_scatter.png"),
+                    "rama2_url": url_for("serve_file",
+                                         pdb_id=pdb2,
+                                         filename=f"{pdb2}_ramachandran.png"),
                     "angles2": angles2,
                     "ca_coords2": ca_coords2,
                     "rmsd": rmsd_value,
