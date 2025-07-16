@@ -13,7 +13,7 @@ The **Protein Structure Explorer** is created to simplify structural bioinformat
 
 ## 🚀 Project Status
 
-This project was developed as part of an educational portfolio, aiming for admission into an undergraduate program in bioinformatics and computational biology.
+This project was developed as part of an educational portfolio, aiming for admission into an undergraduate program.
 
 ## 👩‍💻 Author
 
