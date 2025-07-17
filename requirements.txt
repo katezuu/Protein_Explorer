@@ -9,3 +9,5 @@ sphinx-rtd-theme
 sphinx
 furo
 types-requests
+pandas
+csv

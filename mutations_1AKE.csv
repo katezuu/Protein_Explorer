@@ -1,0 +1,17 @@
+residue_number,original,mutated,category
+13,K,A,Catalytic_neutralisation
+36,R,A,Catalytic_neutralisation
+37,A,G,Flexibility_increase
+53,I,P,Fold_kink_probe
+82,L,D,Hydrophobe_to_charged
+93,D,N,Charge_removal
+119,R,E,Charge_swap
+120,F,A,Hydrophobe_to_alanine
+122,G,P,Proline_rigidification
+134,L,P,Helix_breaker
+148,V,W,Bulky_hydrophobe_to_Trp
+156,R,A,Catalytic_neutralisation
+158,D,N,Charge_removal
+171,Y,F,Aromatic_Hbond_loss
+175,T,A,SerThr_to_Ala_scan
+
