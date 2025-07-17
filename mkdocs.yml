@@ -2,6 +2,7 @@ site_name: Protein Structure Explorer
 site_description: "Interactive 3D visualization and mutation analysis of protein structures"
 repo_url: https://github.com/katezuu/Protein_Explorer
 edit_uri: edit/main/docs
+
 theme:
   name: material
   palette:
@@ -9,6 +10,7 @@ theme:
     accent: orange
   font:
     text: Roboto
+
 nav:
   - Home: index.md
   - Features: features.md
@@ -17,3 +19,6 @@ nav:
   - About: about.md
   - Analysis: analysis.md
 
+docs_dir: docs       # откуда брать Markdown
+# убираем site_dir, по‑умолчанию MkDocs пишет в папку `site/`
+# site_dir: site
