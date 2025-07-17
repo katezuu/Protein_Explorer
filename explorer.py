@@ -1,6 +1,5 @@
 """Utility wrappers for Protein Explorer."""
 from sphinx.util import requests
-import requests
 from io_utils import (
     download_cif,
     download_pdb,
