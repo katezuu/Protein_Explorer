@@ -1,5 +1,5 @@
 """Utility wrappers for Protein Explorer."""
-from sphinx.util import requests
+import requests
 from io_utils import (
     download_cif,
     download_pdb,
@@ -82,24 +82,17 @@ __all__ = [
 def fetch_uniprot_variants(accession: str) -> list:
     """
     Fetch variant data from UniProt REST API for a given accession.
-    Возвращает список словарей вида {'position': <int>}.
+    Returns list of dicts with key 'position'.
     """
     url = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
-    # Выполняем запрос
     resp = requests.get(url, timeout=10)
     resp.raise_for_status()
 
     data = resp.json()
     variants = []
-    # Ищем все элементы в top‑level features
     for feature in data.get("features", []):
-        loc = feature.get("location")
-        # Пропускаем, если нет словаря с ключом 'start'
-        if not isinstance(loc, dict) or "start" not in loc:
-            continue
-        pos = loc["start"]
-        # Добавляем только если удалось извлечь позицию
+        loc = feature.get("location", {})
+        pos = loc.get("start")
         if isinstance(pos, int):
             variants.append({"position": pos})
-
     return variants
