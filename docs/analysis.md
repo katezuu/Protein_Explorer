@@ -4,11 +4,11 @@
 
 ### RMSD for single‑point mutations
 
-![RMSD chart](plots/mutation_rmsd.png)
+![RMSD chart](docs/_static/mutation_rmsd.png)
 
 ### Center‑of‑mass shift for mutations
 
-![ΔCOM chart](plots/mutation_com_shift.png)
+![ΔCOM chart](docs/_static/mutation_com_shift.png)
 
 ## Quantitative Summary
 
