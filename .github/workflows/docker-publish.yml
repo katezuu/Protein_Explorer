@@ -31,4 +31,3 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/protein-explorer:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/protein-explorer:${{ github.sha }}
-
