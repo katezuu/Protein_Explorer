@@ -1,3 +1,4 @@
+![logo](images/logo.png)
 # 🧬 Protein Structure Explorer
 
 **Protein Structure Explorer** lets you fetch, visualize, and analyze protein structures interactively.
@@ -16,3 +17,4 @@
 - [Installation](installation.md)
 - [Usage](usage.md)
 - [About](about.md)
+- [Analysis](analysis.md)

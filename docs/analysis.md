@@ -1,14 +1,16 @@
+![logo](images/logo.png)
+
 # Analysis of Single‑Point Mutations in Adenylate Kinase (1AKE)
 
 ## Mutation Analysis Results
 
 ### RMSD for single‑point mutations
 
-![RMSD chart](docs/_static/mutation_rmsd.png)
+![RMSD chart](images/mutation_rmsd.png)
 
 ### Center‑of‑mass shift for mutations
 
-![ΔCOM chart](docs/_static/mutation_com_shift.png)
+![ΔCOM chart](images/mutation_com_shift.png)
 
 ## Quantitative Summary
 
