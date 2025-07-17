@@ -1,36 +1,45 @@
-![logo](_static/logo.png)
-# 🛠️ Installation Guide
+Installation
+============
 
-## 💻 Local Installation
+Prerequisites
+-------------
 
-Clone the repository and set up the virtual environment:
+- Python 3.8 or higher
+- Git
+- (Optional) virtualenv
 
-```bash
-git clone https://github.com/katezuu/Protein_Explorer.git
-cd Protein_Explorer
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
-pip install -r requirements.txt
-python app.py
-```
+Local Installation
+------------------
+
+#. Clone the repository:
+
+   .. code-block:: bash
+
+      git clone https://github.com/katezuu/Protein_Explorer.git
+      cd Protein_Explorer
+
+#. Create and activate a virtual environment:
+
+   .. code-block:: bash
+
+      python3 -m venv .venv
+      source .venv/bin/activate      # On Windows: .venv\Scripts\activate
+
+#. Install Python dependencies:
+
+   .. code-block:: bash
+
+      pip install --upgrade pip
+      pip install -r requirements.txt
 
 
-Then open your browser at:
-
-
-```
-http://localhost:5000
-```
-
-## 🐳 Docker (Recommended)
+Docker (Recommended)
+------------------
 Pull and run the Docker image:
 
+   .. code-block:: bash
 
-```bash
-docker pull katezu/protein-explorer:latest
-docker run -d -p 5000:5000 katezu/protein-explorer:latest
-Then open your browser at:
+      docker pull katezu/protein-explorer:latest
+      docker run -d -p 5000:5000 katezu/protein-explorer:latest
 
-http://localhost:5000
-```
+Then open your browser at: http://localhost:5000

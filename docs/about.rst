@@ -1,22 +1,28 @@
-![logo](_static/logo.png)
-# ℹ️ About This Project
+About
+=====
 
-## 🎯 Purpose
+**Protein Structure Explorer** is an open‐source toolkit for:
 
-The **Protein Structure Explorer** is created to simplify structural bioinformatics, allowing quick and effective protein structure analysis suitable for educational and research purposes.
+- Interactive 3D visualization of macromolecular structures.
+- Structural analysis (scatter plots, dihedral angles).
+- In‐browser mutation modelling with RMSD & COM shift metrics.
+- Comparing two structures via Cα RMSD.
 
-## 🛠️ Technology Stack
+It is built with:
 
-- **Python** with **Flask**
-- **BioPython** and **NumPy**
-- **JavaScript** with **NGL Viewer** and **Plotly**
-- **Bootstrap 5**
+- **Flask** for the web interface
+- **Biopython** for structure parsing & superposition
+- **NGLViewer** for in‐browser 3D rendering
+- **Matplotlib** & **Plotly** for plotting
+- **Sphinx** for documentation
 
-## 🚀 Project Status
+License
+-------
 
-This project was developed as part of an educational portfolio, aiming for admission into an undergraduate program.
+This project is released under the **MIT License**.
 
-## 👩‍💻 Author
+Contributors
+------------
 
-**Ekaterina Paramonova**  
-GitHub: [katezuu](https://github.com/katezuu)
+- Kate Z. (@katezuu)
+

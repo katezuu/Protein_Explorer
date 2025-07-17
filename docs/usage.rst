@@ -1,21 +1,39 @@
-![logo](_static/logo.png)
-# 📚 Usage Guide
+Usage Guide
+===========
 
-## 🧬 Analyze a Protein Structure
+Running the Web App
+-------------------
 
-1. Enter the 4-character PDB ID into the form.
-2. Click "Analyze Structure".
-3. View interactive 3D protein structures and structural details.
+1. Activate your virtual environment (if not already active):
 
-## ⚗️ Mutation Analysis
+   .. code-block:: bash
 
-1. Select a chain and residue number.
-2. Enter the original and mutated amino acids (one-letter codes).
-3. Click "Analyse Mutation".
-4. Check structural metrics (RMSD and COM shift) and visual mutation highlighting.
+      source .venv/bin/activate
 
-## 🔎 Compare Two Proteins
+2. Start the Flask server:
 
-1. Enter two valid PDB IDs.
-2. Click "Analyze Structures".
-3. View comparative RMSD and individual structural data side-by-side.
+   .. code-block:: bash
+
+      python app.py
+
+3. Open your browser to:
+
+   .. code-block:: none
+
+      http://localhost:5000
+
+4. Enter a 4‑character PDB ID and click **Analyze**.
+
+Analyzing Single‐Point Mutations
+-------------------------------
+
+1. On the results page, select a chain and residue number.
+2. Enter the original and mutated one‐letter amino acids.
+3. Click **Analyse Mutation**.
+4. View RMSD, center‐of‐mass shift, and see the mutated residue highlighted.
+
+Comparing Two Proteins
+----------------------
+
+On the home page, provide two PDB IDs. The app will compute and display the RMSD between them.
+

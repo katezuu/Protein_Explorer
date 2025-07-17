@@ -1,15 +1,24 @@
-![logo](_static/logo.png)
-# 🚀 Features
+Features
+========
 
-- **Fetch PDB & mmCIF**: automatic download with retries and caching  
-- **3D Visualization**: interactive NGL Viewer  
-- **Structural Stats**:  
-  - Total residues & per-chain counts  
-  - Center of mass of Cα atoms  
-  - φ/ψ dihedral angles (Ramachandran plot)  
-- **Cα 3D Scatter**: Plotly 3D scatter of all Cα atoms  
-- **Mutation Modelling**:  
-  - Single-point mutation simulation  
-  - RMSD & COM‑shift calculations  
-  - Highlight mutated residue in 3D  
-- **Comparative Mode**: compute RMSD between two structures side by side  
+* **Interactive 3D Rendering**
+  View protein structures in your browser via NGLViewer.
+
+* **Cα Scatter Plot**
+  See the spatial distribution of Cα atoms.
+
+* **Ramachandran Plot**
+  Analyze φ (phi) vs. ψ (psi) dihedral angles.
+
+* **Mutation Analysis**
+  Compute RMSD and center‐of‐mass shifts for single‐point mutations.
+
+* **Structure Comparison**
+  Align and compare two PDB/mmCIF files, reporting RMSD.
+
+* **Downloadable Outputs**
+  Export PNG figures and model files (.pdb/.cif).
+
+* **Automatic File Retrieval**
+  Fetch PDB or mmCIF coordinates with retry logic and local caching.
+

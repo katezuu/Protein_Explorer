@@ -1,14 +1,22 @@
-Welcome to Protein Structure Explorer’s documentation!
-=====================================================
+.. _index:
+
+Protein Structure Explorer
+==========================
+
+Interactive 3D visualization and mutation analysis of protein structures.
+
+.. rubric:: Contents
 
 .. toctree::
    :maxdepth: 2
-   :caption: Содержание:
 
-   installation
    features
+   installation
    usage
-   api
    analysis
    about
-   changelog
+
+.. include:: /CHANGELOG.rst
+   :start-after: <!-- changelog-start -->
+   :end-before: <!-- changelog-end -->
+
