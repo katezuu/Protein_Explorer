@@ -105,7 +105,7 @@ heroku open
 
 ## 📖 Documentation
 
-Detailed documentation and API descriptions are available in the [docs](./docs) folder.
+Detailed documentation is available in the [docs](./docs) folder.
 
 ---
 
