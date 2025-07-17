@@ -17,3 +17,5 @@ nav:
   - About: about.md
   - Analysis: analysis.md
 
+site_dir: docs
+
