@@ -6,9 +6,9 @@ from io_utils import parse_structure
 
 
 def compute_center_of_mass(structure) -> np.ndarray:
-    coords = [atom.get_coord()
-              for atom in structure.get_atoms() if atom.get_id() == "CA"]
+    coords = [atom.get_coord() for atom in structure.get_atoms()]
     if not coords:
+        # если вдруг нет атомов
         return np.array([np.nan, np.nan, np.nan])
     return np.mean(coords, axis=0)
 

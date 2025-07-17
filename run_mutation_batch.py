@@ -1,55 +1,111 @@
 import os
 import csv
-import pandas as pd
-
-from explorer import download_structure, parse_structure, model_mutation
-from metrics import compute_mutation_rmsd, compute_center_of_mass_difference
-
-#  ————————————————————————————————————————————————————————————————
-# Параметры
-PDB_ID = "1AKE"
-MUT_CSV = "mutations_1AKE.csv"
-OUTPUT_ROOT = "outputs"
-RESULTS_DIR = "results"
-RESULTS_FILE = os.path.join(RESULTS_DIR, "mutation_metrics_1AKE.csv")
-#  ————————————————————————————————————————————————————————————————
-
-os.makedirs(RESULTS_DIR, exist_ok=True)
-
-# 1) Скачиваем нужную структуру (mmCIF.gz или PDB)
-serve_name, fmt, parse_name = download_structure(
-    PDB_ID,
-    os.path.join(OUTPUT_ROOT, PDB_ID)
+from io_utils import download_structure, parse_structure
+from mutation import model_mutation
+from metrics import (
+    compute_mutation_rmsd,
+    compute_center_of_mass_difference
 )
-wt_path = os.path.join(OUTPUT_ROOT, PDB_ID, parse_name)
+from Bio.PDB import is_aa
 
-# 2) Парсим «дикую» структуру
-wt_struct = parse_structure(wt_path)
 
-# 3) Читаем CSV со списком мутаций
-with open(MUT_CSV, newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    muts = list(reader)
+def find_chain_for_residue(structure, residue_number):
+    """
+    Ищет в структуре цепь, в которой есть аминокислотный
+    остаток с данным номером.
+    Возвращает ID цепи (строку), либо None, если не найден.
+    """
+    for model in structure:
+        for chain in model:
+            for res in chain:
+                if is_aa(res) and res.id[1] == residue_number:
+                    return chain.id
+    return None
 
-# 4) Для каждой мутации делаем модель, считаем RMSD и COM-сдвиг
-results = []
-for m in muts:
-    # собираем строку вида A141D
-    mut_str = f"{m['original']}{m['residue_number']}{m['mutated']}"
-    try:
-        mut_struct = model_mutation(wt_path, mut_str)
-        rmsd = compute_mutation_rmsd(wt_struct, mut_struct)
-        com = compute_center_of_mass_difference(wt_struct, mut_struct)
-    except Exception as e:
-        rmsd, com = None, None
-    results.append({
-        **m,
-        "mutation": mut_str,
-        "rmsd": rmsd,
-        "com_shift": com
-    })
 
-# 5) Сохраняем таблицу результатов
-df = pd.DataFrame(results)
-df.to_csv(RESULTS_FILE, index=False)
-print(f"Done: {len(results)} records → {RESULTS_FILE}")
+def main():
+    PDB_ID = "1AKE"
+    OUTPUT_ROOT = "outputs"
+    os.makedirs(os.path.join(OUTPUT_ROOT, PDB_ID), exist_ok=True)
+
+    # 1) Скачиваем и разбираем WT-структуру
+    serve_name, fmt = download_structure(
+        PDB_ID,
+        os.path.join(OUTPUT_ROOT, PDB_ID)
+    )
+    if fmt == "mmcif_gz":
+        # serve_name == "1AKE.cif.gz" → parse_name == "1AKE.cif"
+        parse_name = serve_name[:-3]
+    else:
+        # serve_name == "1AKE.cif" или "1AKE.pdb"
+        parse_name = serve_name
+    wt_path = os.path.join(OUTPUT_ROOT, PDB_ID, parse_name)
+    wt_struct = parse_structure(wt_path)
+
+    # 2) Открываем CSV с мутациями и создаём выходной CSV
+    input_csv = "mutations_1AKE.csv"
+    output_csv = "mutation_results.csv"
+    with open(input_csv, newline="") as f_in, \
+            open(
+                output_csv,
+                "w",
+                newline=""
+            ) as f_out:
+
+        reader = csv.DictReader(f_in)
+        # добавляем новые колонки
+        fieldnames = (
+                reader.fieldnames
+                + ["chain", "mutation", "rmsd", "com_shift"]
+        )
+        writer = csv.DictWriter(f_out, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for row in reader:
+            pos = int(row["residue_number"])
+            mut = row["mutated"]
+
+            # 3) Определяем цепь
+            chain = row.get("chain")
+            if not chain:
+                chain = find_chain_for_residue(wt_struct, pos)
+            if chain is None:
+                print(
+                    f"[WARNING] Residue {pos} not found in any chain "
+                    "→ skipped"
+                )
+                continue
+
+            # 4) Формируем строку мутации и считаем метрики
+            mut_str = f"{chain}{pos}{mut}"
+            try:
+                mut_struct = model_mutation(wt_path, mut_str)
+                rmsd = compute_mutation_rmsd(
+                    wt_struct,
+                    mut_struct,
+                    mut_str
+                )
+                com_shift = compute_center_of_mass_difference(
+                    wt_struct,
+                    mut_struct
+                )
+            except Exception as e:
+                print(f"[WARNING] Error for {mut_str}: {e}")
+                rmsd, com_shift = "", ""
+
+            # 5) Записываем в CSV
+            row.update(
+                {
+                    "chain": chain,
+                    "mutation": mut_str,
+                    "rmsd": rmsd,
+                    "com_shift": com_shift
+                }
+            )
+            writer.writerow(row)
+
+    print(f"Done! Results saved to {output_csv}")
+
+
+if __name__ == "__main__":
+    main()
