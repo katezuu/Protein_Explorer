@@ -1,24 +1,21 @@
-name: Build & Deploy Docs
-
 on:
   push:
     branches:
-      - master  # или main
+      - master   # или main
 
-# 1) Дадим workflow право пушить в Pages
 permissions:
-  pages: write
-  id-token: write
+  pages: write       # чтобы action мог пушить в gh-pages
+  id-token: write    # нужно для configure-pages
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 2) Чекаут кода (persist-credentials по умолчанию true)
+      # 1) Чекаут кода
       - uses: actions/checkout@v3
 
-      # 3) Пайтон и зависимости
+      # 2) Устанавливаем Python и зависимости
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -28,20 +25,20 @@ jobs:
         run: |
           pip install mkdocs mkdocs-material
 
-      # 4) Собираем статический сайт
+      # 3) Сборка сайта
       - name: Build site
         run: mkdocs build --strict
 
-      # 5) Настроить Pages
+      # 4) Подготовка Pages
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v3
 
-      # 6) Упаковать директорию site в артефакт
+      # 5) Загружаем собранный статик как артефакт (v2!)
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           path: ./site
 
-      # 7) Собственно деплой
+      # 6) Деплой
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
