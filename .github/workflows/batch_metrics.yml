@@ -32,7 +32,7 @@ jobs:
         python run_mutation_batch.py
 
     - name: Upload results artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: mutation-metrics-1AKE
         path: results/mutation_metrics_1AKE.csv
