@@ -1,13 +1,4 @@
-import os
-import sys
 import pytest
-
-# Добавляем корень репозитория в sys.path, чтобы import app работал
-sys.path.insert(
-    0,
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
-)
-
 from app import create_app
 import io_utils
 
@@ -40,7 +31,7 @@ def test_post_invalid_pdb(client):
 
 
 def test_post_valid_but_nonexistent_pdb(monkeypatch, client):
-    def fake_download(pdb_id, out_dir):
+    def fake_download():
         raise FileNotFoundError("PDB not found")
 
     monkeypatch.setattr(io_utils, "download_pdb", fake_download)
