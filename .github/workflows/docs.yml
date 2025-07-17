@@ -1,44 +1,40 @@
 on:
   push:
     branches:
-      - master   # или main
+      - master
 
 permissions:
-  pages: write       # чтобы action мог пушить в gh-pages
-  id-token: write    # нужно для configure-pages
+  contents: read          # для checkout
+  pages: write            # чтобы иметь право пушить в gh-pages
+  id-token: write         # необязательно для этого экшена, но полезно для future needs
 
 jobs:
-  build-and-deploy:
+  docs:
     runs-on: ubuntu-latest
-
     steps:
-      # 1) Чекаут кода
-      - uses: actions/checkout@v3
+      # 1) Клонируем репо
+      - uses: actions/checkout@v4
 
-      # 2) Устанавливаем Python и зависимости
+      # 2) Устанавливаем Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
+      # 3) Устанавливаем зависимости (MkDocs + тема)
       - name: Install dependencies
         run: |
-          pip install mkdocs mkdocs-material
+          pip install mkdocs-material
 
-      # 3) Сборка сайта
+      # 4) Сборка сайта
       - name: Build site
-        run: mkdocs build --strict
+        run: mkdocs build --strict --site-dir site
 
-      # 4) Подготовка Pages
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v3
-
-      # 5) Загружаем собранный статик как артефакт (v2!)
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./site
-
-      # 6) Деплой
+      # 5) Деплой в ветку gh-pages
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages        # ветка, куда пушим
+          folder: site            # папка с готовым сайтом
+          clean: true             # удалять всё в gh-pages перед пушем
+          token: ${{ secrets.GITHUB_TOKEN }}
