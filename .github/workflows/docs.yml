@@ -1,26 +1,25 @@
-name: Build & Deploy Sphinx Docs
+# .github/workflows/docs.yml
+name: Build & Deploy Sphinx Docs to master/docs
 
 on:
   push:
     branches: [ master ]
-  pull_request:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write     # нужно, чтобы GITHUB_TOKEN имел право пушить
+  id-token: write     # на будущее, если понадобятся OIDC токены
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install Sphinx and theme
         run: |
@@ -28,17 +27,20 @@ jobs:
 
       - name: Build HTML docs
         working-directory: docs
-        run: sphinx-build -b html . _build/html
+        run: |
+          sphinx-build -b html . _build/html
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v3
-
-      - name: Upload Pages artifact
-        # Обновлено до v3 — чтобы не подтягивать устаревший upload-artifact@v3
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/_build/html
-
-      - name: Deploy to GitHub Pages
-        # Последняя версия для deploy-pages
-        uses: actions/deploy-pages@v5
+      - name: Deploy into docs/ on master
+        run: |
+          # удаляем старый HTML
+          rm -rf docs/*
+          # копируем свежесобранный
+          cp -r docs/_build/html/* docs/
+          # коммитим и пушим
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git commit -m "Rebuild Sphinx docs" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
