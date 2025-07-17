@@ -29,5 +29,5 @@ jobs:
           context: .
           push: true
           tags: |
-            katezuu/protein-explorer:latest
-            katezuu/protein-explorer:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/protein-explorer:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/protein-explorer:${{ github.sha }}
