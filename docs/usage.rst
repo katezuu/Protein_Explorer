@@ -1,4 +1,4 @@
-![logo](images/logo.png)
+![logo](_static/logo.png)
 # 📚 Usage Guide
 
 ## 🧬 Analyze a Protein Structure

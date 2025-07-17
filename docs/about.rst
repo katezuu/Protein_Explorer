@@ -1,4 +1,4 @@
-![logo](images/logo.png)
+![logo](_static/logo.png)
 # ℹ️ About This Project
 
 ## 🎯 Purpose

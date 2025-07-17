@@ -1,4 +1,4 @@
-![logo](images/logo.png)
+![logo](_static/logo.png)
 # 🚀 Features
 
 - **Fetch PDB & mmCIF**: automatic download with retries and caching  

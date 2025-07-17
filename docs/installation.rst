@@ -1,4 +1,4 @@
-![logo](images/logo.png)
+![logo](_static/logo.png)
 # 🛠️ Installation Guide
 
 ## 💻 Local Installation
