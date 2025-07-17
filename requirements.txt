@@ -10,4 +10,3 @@ sphinx
 furo
 types-requests
 pandas
-csv
