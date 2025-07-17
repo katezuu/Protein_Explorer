@@ -3,28 +3,45 @@ name: Build & Deploy Docs
 on:
   push:
     branches:
-      - master
+      - master  # или main
+
+# 1) Дадим workflow право пушить в Pages
+permissions:
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
+      # 2) Чекаут кода (persist-credentials по умолчанию true)
       - uses: actions/checkout@v3
 
+      # 3) Пайтон и зависимости
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
           pip install mkdocs mkdocs-material
 
+      # 4) Собираем статический сайт
       - name: Build site
         run: mkdocs build --strict
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      # 5) Настроить Pages
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v3
+
+      # 6) Упаковать директорию site в артефакт
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          path: ./site
+
+      # 7) Собственно деплой
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
