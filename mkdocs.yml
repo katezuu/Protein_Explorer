@@ -1,9 +1,17 @@
 site_name: Protein Structure Explorer
+site_description: "Interactive 3D visualization and mutation analysis of protein structures"
+repo_url: https://github.com/katezuu/Protein_Explorer
+edit_uri: edit/main/docs
+theme:
+  name: material
+  palette:
+    primary: teal
+    accent: orange
+  font:
+    text: Roboto
 nav:
   - Home: index.md
   - Features: features.md
   - Installation: installation.md
   - Usage: usage.md
   - About: about.md
-theme:
-  name: material

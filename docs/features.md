@@ -1,21 +1,14 @@
 # 🚀 Features
 
-The Protein Structure Explorer includes several essential features:
-
-#### 🧬 Protein Visualization
-Interactively explore protein 3D structures directly from the Protein Data Bank.
-
-#### 🔍 Structural Analysis
-Analyze residues, chains, and the center of mass.
-
-#### ⚙️ Mutation Simulation
-Model mutations and calculate metrics like RMSD and COM shifts.
-
-#### 📊 Ramachandran Plots
-Visualize phi (φ) and psi (ψ) angles to evaluate protein structural validity.
-
-#### 📐 Structural Comparison
-Easily compute and visualize the RMSD between two protein structures.
-
-#### 💻 Modern Web Interface
-Built with Flask and Bootstrap, providing a clean, user-friendly experience.
+- **Fetch PDB & mmCIF**: automatic download with retries and caching  
+- **3D Visualization**: interactive NGL Viewer  
+- **Structural Stats**:  
+  - Total residues & per-chain counts  
+  - Center of mass of Cα atoms  
+  - φ/ψ dihedral angles (Ramachandran plot)  
+- **Cα 3D Scatter**: Plotly 3D scatter of all Cα atoms  
+- **Mutation Modelling**:  
+  - Single-point mutation simulation  
+  - RMSD & COM‑shift calculations  
+  - Highlight mutated residue in 3D  
+- **Comparative Mode**: compute RMSD between two structures side by side  

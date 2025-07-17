@@ -1,9 +1,18 @@
 # 🧬 Protein Structure Explorer
 
-Welcome to the **Protein Structure Explorer**, a powerful web-based bioinformatics tool built to visualize and analyze protein structures easily and interactively.
+**Protein Structure Explorer** lets you fetch, visualize, and analyze protein structures interactively.
 
-## 🌟 Quick Links
+- 3D viewer with **NGL**
+- Structural metrics: residues, COM, φ/ψ angles
+- Mutation simulation & highlighting
+- RMSD comparisons
+- API for automated analyses
+
+---
+
+## Quick links
+
 - [Features](features.md)
 - [Installation](installation.md)
-- [Usage Guide](usage.md)
-- [About the Project](about.md)
+- [Usage](usage.md)
+- [About](about.md)

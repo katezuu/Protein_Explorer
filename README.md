@@ -5,122 +5,88 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/katezu/protein-explorer.svg)](https://hub.docker.com/r/katezu/protein-explorer)
 [![Docs](https://img.shields.io/website?url=https%3A%2F%2Fkatezuu.github.io%2FProtein_Explorer%2F)](https://katezuu.github.io/Protein_Explorer/)
 
-**Protein Structure Explorer** is a web-based bioinformatics tool designed to visualize and analyze protein structures directly from the Protein Data Bank (PDB). It allows users to perform detailed structural analysis, visualize protein 3D models, and simulate mutations.
+Protein Structure Explorer is a Flask‑based web application for **interactive 3D visualization**, **structural analysis**, and **mutation modelling** of proteins fetched directly from the PDB or mmCIF archives.
+
+- **3D Viewer** powered by NGL Viewer  
+- **Structural stats**: residue counts, center-of-mass, φ/ψ angles  
+- **Ramachandran & Cα scatter plots** via Plotly  
+- **Mutation simulation** with RMSD & COM-shift metrics  
+- **Comparison mode**: compute RMSD between two structures  
 
 ---
 
-## 🚀 Key Features
+## 🔍 Features
 
-- **3D Visualization**: Interactive 3D views of protein structures using NGL Viewer.
-- **Residue Analysis**: Compute total residues, residues per chain, and center of mass.
-- **Mutation Analysis**: Model single-point mutations and calculate structural metrics (RMSD and COM shift).
-- **Ramachandran Plot**: Visualize φ (phi) and ψ (psi) angles for structural validation.
-- **Comparative Analysis**: Calculate RMSD between two protein structures.
-- **Interactive UI**: Easy-to-use web interface built with Flask and Bootstrap 5.
-
----
-
-## 🛠️ Technologies Used
-
-- **Backend**: Python, Flask, BioPython, NumPy, Matplotlib.
-- **Frontend**: HTML, CSS, Bootstrap 5, JavaScript, NGL Viewer, Plotly.
-- **DevOps**: Docker, GitHub Actions for CI/CD, Heroku/Render deployment ready.
+- **Fetch PDB/mmCIF** files (with retry & caching)  
+- **Parse & analyze** using BioPython  
+- **Visualize** via NGL and Plotly  
+- **Model point mutations** and highlight them in 3D  
+- **API endpoints** for metrics and mutation analysis  
 
 ---
 
-## ⚙️ Installation and Usage
+## 🛠️ Quick Start
 
-### Local Development
+### Local
 
-1. **Clone this repository**:
-```bash
-git clone https://github.com/katezuu/Protein_Explorer.git
-cd Protein_Explorer
-```
+1. Clone & enter directory  
+   ```bash
+   git clone https://github.com/katezuu/Protein_Explorer.git
+   cd Protein_Explorer
+2. Create & activate venv
 
-2. **Create and activate virtual environment**:
 ```bash
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+source venv/bin/activate   # on Windows: venv\Scripts\activate
 ```
+3. Install deps
 
-3. **Install dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
+3. Run
 
-4. **Run the application**:
 ```bash
 python app.py
 ```
+Browse http://127.0.0.1:5000
 
-5. **Open your browser** and navigate to:
-```
-http://127.0.0.1:5000
-```
-
-### Docker (Recommended)
-
-1. **Pull the latest Docker image**:
+---
+## Docker
 ```bash
 docker pull katezu/protein-explorer:latest
-```
-
-2. **Run with Docker**:
-```bash
 docker run -d -p 5000:5000 katezu/protein-explorer:latest
 ```
 
-3. **Access via browser**:
-```
-http://localhost:5000
-```
-
 ---
 
-## 🚧 Testing
-
-Run unit tests using:
+### 🚦 Testing & CI
 ```bash
 pytest
+flake8
 ```
+Continuous integration is set up via GitHub Actions (see .github/workflows/ci.yml).
 
 ---
-
-## 📦 Deployment
-
-This application is ready for deployment on platforms like **Heroku** or **Render**.
-
-Example Heroku deployment commands:
+## 📚 Documentation & GitHub Pages
+We use MkDocs with the Material theme for our docs site:
 
 ```bash
-heroku create protein-explorer-yourname
-git push heroku main
-heroku ps:scale web=1
-heroku open
+pip install mkdocs mkdocs-material
+mkdocs gh-deploy
 ```
 
----
-
-## 📖 Documentation
-
-Detailed documentation is available in the [docs](./docs) folder.
+Site lives at:
+https://katezuu.github.io/Protein_Explorer/
 
 ---
+## 🤝 Contributing
+Fork → branch
 
-## ✅ Contributing
+Code → tests → commit
 
-Contributions are welcome! Follow these steps:
-
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/amazing-feature`).
-3. Commit changes (`git commit -m 'Add amazing feature'`).
-4. Push to the branch (`git push origin feature/amazing-feature`).
-5. Create a new Pull Request.
+PR for review
 
 ---
-
 ## 📄 License
-
-This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
+MIT © Ekaterina Paramonova
