@@ -12,6 +12,7 @@ Protein Structure Explorer is a Flask‑based web application for **interactive 
 - **Ramachandran & Cα scatter plots** via Plotly  
 - **Mutation simulation** with RMSD & COM-shift metrics  
 - **Comparison mode**: compute RMSD between two structures  
+![PE GIF.gif](docs/_static/PE%20GIF.gif)
 
 ---
 
