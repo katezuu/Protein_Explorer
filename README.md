@@ -82,6 +82,11 @@ mkdocs gh-deploy
 Site lives at:
 https://katezuu.github.io/Protein_Explorer/
 
+
+---
+## Research summary
+[project‑summary.pdf](paper/project%E2%80%91summary.pdf)
+
 ---
 ## 🤝 Contributing
 Fork → branch
