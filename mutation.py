@@ -22,7 +22,8 @@ def model_mutation(pdb_path: str, mutation: str):
     try:
         pos = int(rest[idx:])
     except ValueError:
-        raise ValueError(f"Invalid mutation string: could not parse residue number from {rest!r}")
+        raise ValueError(f"Invalid mutation string:\
+         could not parse residue number from {rest!r}")
 
     # rotation matrix (Rodrigues' formula) for 45° about Z
     theta = np.deg2rad(45.0)
