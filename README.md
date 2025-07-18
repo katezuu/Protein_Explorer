@@ -53,10 +53,13 @@ Browse http://127.0.0.1:5000
 
 ---
 ## Docker
+1. Start Docker Desktop
+2. Run
 ```bash
 docker pull katezu/protein-explorer:latest
 docker run -d -p 5000:5000 katezu/protein-explorer:latest
 ```
+Browse http://127.0.0.1:5000
 
 ---
 

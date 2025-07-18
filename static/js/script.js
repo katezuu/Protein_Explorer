@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const stage = i === 1 ? window.stage1 : window.stage2;
         if (comp) {
           comp.addRepresentation("ball+stick", {
-            sele: `${resNum} and :${chain}`,
+            sele: `:${chain} and ${resNum}`,
             colorValue: 0xFF0000,
             scale: 2.5
           });

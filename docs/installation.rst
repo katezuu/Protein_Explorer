@@ -35,6 +35,7 @@ Local Installation
 
 Docker (Recommended)
 ------------------
+Start Docker Desktop
 Pull and run the Docker image:
 
    .. code-block:: bash
