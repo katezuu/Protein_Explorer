@@ -5,6 +5,8 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/katezu/protein-explorer.svg)](https://hub.docker.com/r/katezu/protein-explorer)
 [![Docs](https://img.shields.io/website?url=https%3A%2F%2Fkatezuu.github.io%2FProtein_Explorer%2F)](https://katezuu.github.io/Protein_Explorer/)
 
+The project was developed for the submission of application documents to POSTECH (Pohang University of Science and Technology) for undergraduate (bachelor's degree) admission.
+
 Protein Structure Explorer is a Flask‑based web application for **interactive 3D visualization**, **structural analysis**, and **mutation modelling** of proteins fetched directly from the PDB or mmCIF archives.
 
 - **3D Viewer** powered by NGL Viewer  
