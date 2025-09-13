@@ -25,5 +25,3 @@ Contributors
 ------------
 
 - Ekaterina Paramonova. (@katezuu)
-
-The project was developed for the submission of application documents to POSTECH (Pohang University of Science and Technology) for undergraduate (bachelor's degree) admission.
