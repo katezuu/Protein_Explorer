@@ -137,6 +137,7 @@ def create_app() -> Flask:
                 "ca_coords1": ca_coords1,
                 "rmsd": None,
                 "pdb2": None,
+                "filename1": serve1,  # FIX: Added for template
             }
 
             # --- process second structure (optional) ---
@@ -164,6 +165,7 @@ def create_app() -> Flask:
                 rama2_png = os.path.join(dir2, f"{pdb2}_ramachandran.png")
                 plot_ramachandran(angles2, rama2_png)
 
+                # FIX: compare_structures now uses copies internally
                 rmsd_value = compare_structures(path1, path2, output_dir)
 
                 result_data.update({
@@ -190,6 +192,7 @@ def create_app() -> Flask:
                     "angles2": angles2,
                     "ca_coords2": ca_coords2,
                     "rmsd": rmsd_value,
+                    "filename2": serve2,  # FIX: Added for template
                 })
 
             return render_template("result.html", **result_data)
@@ -210,15 +213,17 @@ def create_app() -> Flask:
             return {"error": "invalid pdb id"}, 400
 
         try:
-            serve, fmt, parse = _download_structure(
-                pdb_id, out_dir=app.config["OUTPUT_DIR"]
-            )
-            path = os.path.join(
-                app.config["OUTPUT_DIR"], pdb_id, parse
-            )
+            # FIX: Parse fresh structure for API call
+            dir_path = os.path.join(app.config["OUTPUT_DIR"], pdb_id)
+            os.makedirs(dir_path, exist_ok=True)
+
+            serve, fmt, parse = _download_structure(pdb_id, dir_path)
+            path = os.path.join(dir_path, parse)
             struct = parse_structure(path)
+
             total, chains = count_residues(struct)
             center = compute_center_of_mass(struct).tolist()
+
             return {
                 "pdb_id": pdb_id,
                 "total_residues": total,
@@ -234,25 +239,30 @@ def create_app() -> Flask:
             return {"error": "invalid pdb id"}, 400
 
         try:
-            serve, fmt, parse = _download_structure(
-                pdb_id, out_dir=app.config["OUTPUT_DIR"]
-            )
-            path = os.path.join(
-                app.config["OUTPUT_DIR"], pdb_id, parse
-            )
+            # FIX: Parse fresh structures for each mutation analysis
+            dir_path = os.path.join(app.config["OUTPUT_DIR"], pdb_id)
+            os.makedirs(dir_path, exist_ok=True)
+
+            serve, fmt, parse = _download_structure(pdb_id, dir_path)
+            path = os.path.join(dir_path, parse)
+
+            # FIX: Fresh parse for wild-type
             wt_struct = parse_structure(path)
+            # FIX: model_mutation creates its own fresh parse internally
             mut_struct = model_mutation(path, mutation)
+
             rmsd_val = compute_mutation_rmsd(
                 wt_struct, mut_struct, mutation
             )
             com_diff = compute_center_of_mass_difference(
                 wt_struct, mut_struct
             )
+
             return {
                 "pdb_id": pdb_id,
                 "mutation": mutation,
-                "rmsd": rmsd_val,
-                "center_of_mass_diff": com_diff,
+                "rmsd": round(rmsd_val, 3),
+                "center_of_mass_diff": round(com_diff, 3),
             }
         except Exception as e:
             app.logger.exception("Mutation analysis failed")

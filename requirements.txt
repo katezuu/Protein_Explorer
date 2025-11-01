@@ -9,4 +9,5 @@ sphinx-rtd-theme
 sphinx
 furo
 types-requests
-pandas
+pandas>=2.0
+urllib3>=2.0

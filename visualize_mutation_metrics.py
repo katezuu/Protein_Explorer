@@ -9,13 +9,23 @@ import matplotlib.pyplot as plt
 
 
 def plot_metrics(df, col, title, ylabel, out_file):
-    plt.figure(figsize=(10, 6))
-    plt.bar(
-        df["mutation"],
-        df[col].astype(float),
-        alpha=0.8
-    )
-    plt.xticks(rotation=45, ha="right")
+    # сортировка по позиции для стабильного порядка
+    df = df.sort_values(["residue_number"], kind="mergesort").copy()
+
+    # читаемые подписи: <orig><pos><mut>, с цепью при необходимости
+    def make_label(r):
+        chain = (str(r.get("chain") or "")).strip()
+        pos = int(r["residue_number"])
+        return f"{chain}{r['original']}{pos}{r['mutated']}" if chain else f"{r['original']}{pos}{r['mutated']}"
+    df["label"] = df.apply(make_label, axis=1)
+
+    # X как индексы, чтобы подписи не «съезжали»
+    x = range(len(df))
+    y = pd.to_numeric(df[col], errors="coerce")
+
+    plt.figure(figsize=(11, 6))
+    plt.bar(x, y, alpha=0.8)
+    plt.xticks(x, df["label"], rotation=45, ha="right")
     plt.title(title)
     plt.xlabel("Mutation")
     plt.ylabel(ylabel)
