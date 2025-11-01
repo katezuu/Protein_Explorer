@@ -25,24 +25,22 @@ def get_atomic_mass(element: str) -> float:
 
 def compute_center_of_mass(structure) -> np.ndarray:
     """
-    FIX: Compute mass-weighted center of mass instead of geometric centroid
+    Compute mass-weighted center of mass.
     """
-    coords: list[np.ndarray] = []
-    masses: list[float] = []
+    coords_list: list[np.ndarray] = []
+    masses_list: list[float] = []
 
     for atom in structure.get_atoms():
-        coords.append(atom.get_coord())
-        # FIX: Use actual atomic masses based on element
+        coords_list.append(atom.get_coord())
         element = atom.element if hasattr(atom, 'element') else 'C'
-        masses.append(get_atomic_mass(element))
+        masses_list.append(get_atomic_mass(element))
 
-    if not coords:
+    if not coords_list:
         return np.array([np.nan, np.nan, np.nan])
 
-    coords = np.array(coords)
-    masses = np.array(masses)
+    coords = np.array(coords_list)
+    masses = np.array(masses_list)
 
-    # FIX: Mass-weighted average instead of simple mean
     com = np.average(coords, axis=0, weights=masses)
     return com
 
