@@ -65,7 +65,8 @@ def main():
             pos = int(row["residue_number"])
             mut = row["mutated"]
 
-            # FIX: Parse WT structure fresh for each mutation to avoid coordinate drift
+            # FIX: Parse WT structure fresh
+            # for each mutation to avoid coordinate drift
             wt_struct = parse_structure(wt_path)
 
             # 3) Determine chain
@@ -113,7 +114,8 @@ def main():
                 print(f"[WARNING] Error for {mut_str}: {e}")
                 rmsd_str = ""
                 com_shift_str = ""
-                status = f"error: {str(e)[:50]}"  # Truncate long error messages
+                # Truncate long error messages
+                status = f"error: {str(e)[:50]}"
                 failure_count += 1
 
             # 5) Write to CSV

@@ -49,7 +49,8 @@ def compute_center_of_mass(structure) -> np.ndarray:
 
 def compare_structures(path1: str, path2: str, out_dir: str) -> float:
     """
-    FIX: Use deep copy to avoid mutating original structure during superposition
+    FIX: Use deep copy to avoid
+    mutating original structure during superposition
     """
     struct1 = parse_structure(path1)
     struct2 = parse_structure(path2)

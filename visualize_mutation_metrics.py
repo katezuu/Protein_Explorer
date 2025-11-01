@@ -18,6 +18,7 @@ def plot_metrics(df, col, title, ylabel, out_file):
         pos = int(r["residue_number"])
         return f"{chain}{r['original']}{pos}{r['mutated']}" \
             if chain else f"{r['original']}{pos}{r['mutated']}"
+
     df["label"] = df.apply(make_label, axis=1)
 
     # X как индексы, чтобы подписи не «съезжали»

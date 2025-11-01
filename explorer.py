@@ -48,8 +48,10 @@ def get_ca_coordinates(structure) -> list:
 
 def get_phi_psi(structure) -> list:
     """
-    FIX: Changed condition from 'if phi and psi:' to 'if phi is not None and psi is not None:'
-    to correctly handle zero-degree angles (which are valid but evaluate to False)
+    FIX: Changed condition from 'if phi and
+    psi:' to 'if phi is not None and psi is not None:'
+    to correctly handle zero-degree
+    angles (which are valid but evaluate to False)
     """
     angles = []
     ppb = PPBuilder()
@@ -106,9 +108,11 @@ def fetch_uniprot_variants(accession: str) -> list:
 
     except requests.exceptions.RequestException as e:
         # FIX: Handle network errors gracefully
-        print(f"Warning: Failed to fetch UniProt variants for {accession}: {e}")
+        print(f"Warning: Failed to fetch "
+              f"UniProt variants for {accession}: {e}")
         return []
     except (KeyError, ValueError) as e:
         # FIX: Handle JSON parsing errors
-        print(f"Warning: Failed to parse UniProt response for {accession}: {e}")
+        print(f"Warning: Failed to parse "
+              f"UniProt response for {accession}: {e}")
         return []

@@ -28,7 +28,7 @@ def model_mutation(pdb_path: str, mutation: str):
         pos = int(rest[idx:])
     except ValueError:
         raise ValueError(
-            f"Invalid mutation string: could not parse residue number from {rest!r}"
+            f"Invalid mutation string: couldn't parse res. number from {rest!r}"
         )
 
     struct = parse_structure(pdb_path)
@@ -87,7 +87,8 @@ def model_mutation(pdb_path: str, mutation: str):
                 new_coord = ca_coord + v_rotated
                 atom.set_coord(new_coord.get_array())
         else:
-            # FIX: For glycine or residues without Cβ, just rename without rotation
+            # FIX: For glycine or residues
+            # without Cβ, just rename without rotation
             pass
 
         break
