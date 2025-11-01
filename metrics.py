@@ -27,8 +27,8 @@ def compute_center_of_mass(structure) -> np.ndarray:
     """
     FIX: Compute mass-weighted center of mass instead of geometric centroid
     """
-    coords = []
-    masses = []
+    coords: list[np.ndarray] = []
+    masses: list[float] = []
 
     for atom in structure.get_atoms():
         coords.append(atom.get_coord())
