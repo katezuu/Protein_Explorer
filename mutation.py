@@ -28,7 +28,8 @@ def model_mutation(pdb_path: str, mutation: str):
         pos = int(rest[idx:])
     except ValueError:
         raise ValueError(
-            f"Invalid mutation string: couldn't parse res. number from {rest!r}"
+            f"Invalid mutation string: "
+            f"couldn't parse res. number from {rest!r}"
         )
 
     struct = parse_structure(pdb_path)
